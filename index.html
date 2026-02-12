@@ -6,17 +6,17 @@
     <title>Realtor Referral Earnings Calculator</title>
     <style>
         :root {
-            --primary: #ffffff;
+            --primary: #1a1a1a;
             --accent: #f5c518;
             --accent-hover: #d4a90e;
-            --success: #f5c518;
+            --success: #16a34a;
             --warning: #dc2626;
-            --bg: #000000;
-            --card-bg: #111111;
-            --text: #ffffff;
-            --text-muted: #a0a0a0;
-            --border: #2a2a2a;
-            --shadow: 0 4px 24px rgba(0,0,0,0.4);
+            --bg: #f5f5f5;
+            --card-bg: #ffffff;
+            --text: #1a1a1a;
+            --text-muted: #555555;
+            --border: #e0e0e0;
+            --shadow: 0 4px 24px rgba(0,0,0,0.08);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -120,7 +120,7 @@
         }
 
         .input-group input::placeholder {
-            color: #555;
+            color: #999;
         }
 
         .input-prefix {
@@ -176,12 +176,12 @@
         }
         .option-card:hover {
             border-color: var(--accent);
-            background: #1a1a00;
+            background: #fef9e7;
         }
         .option-card.selected {
             border-color: var(--accent);
-            background: #2a2500;
-            color: var(--accent);
+            background: #fef3cd;
+            color: #1a1a1a;
         }
 
         /* Buttons */
@@ -203,23 +203,23 @@
 
         .btn-primary {
             background: var(--accent);
-            color: #000;
+            color: #1a1a1a;
             flex: 1;
             font-weight: 700;
         }
         .btn-primary:hover { background: var(--accent-hover); }
         .btn-primary:disabled {
-            background: #444;
+            background: #ccc;
             color: #888;
             cursor: not-allowed;
         }
 
         .btn-back {
-            background: transparent;
+            background: #fff;
             color: var(--text-muted);
             border: 2px solid var(--border);
         }
-        .btn-back:hover { background: #222; }
+        .btn-back:hover { background: #f0f0f0; }
 
         /* Results page */
         .results-section { display: none; }
@@ -245,16 +245,16 @@
         }
 
         .result-card.current {
-            background: #1a1111;
-            border: 1px solid #3a2020;
+            background: #fef2f2;
+            border: 1px solid #fecaca;
         }
         .result-card.potential {
-            background: #112211;
-            border: 1px solid #1a3a1a;
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
         }
         .result-card.gap {
-            background: #1a1800;
-            border: 1px solid #3a3200;
+            background: #fef9e7;
+            border: 1px solid #f5c518;
         }
 
         .result-label {
@@ -264,17 +264,17 @@
             letter-spacing: 1px;
             margin-bottom: 4px;
         }
-        .result-card.current .result-label { color: #ff6b6b; }
-        .result-card.potential .result-label { color: #4ade80; }
-        .result-card.gap .result-label { color: #f5c518; }
+        .result-card.current .result-label { color: #991b1b; }
+        .result-card.potential .result-label { color: #166534; }
+        .result-card.gap .result-label { color: #92400e; }
 
         .result-value {
             font-size: 32px;
             font-weight: 800;
         }
-        .result-card.current .result-value { color: #ff6b6b; }
-        .result-card.potential .result-value { color: #4ade80; }
-        .result-card.gap .result-value { color: #f5c518; }
+        .result-card.current .result-value { color: var(--warning); }
+        .result-card.potential .result-value { color: var(--success); }
+        .result-card.gap .result-value { color: #b45309; }
 
         .result-detail {
             font-size: 13px;
@@ -307,14 +307,14 @@
         .breakdown-row .label { color: var(--text-muted); }
         .breakdown-row .value { font-weight: 600; color: var(--text); }
         .breakdown-row.highlight {
-            background: #112211;
+            background: #f0fdf4;
         }
-        .breakdown-row.highlight .value { color: #4ade80; font-weight: 700; }
+        .breakdown-row.highlight .value { color: var(--success); font-weight: 700; }
 
         /* Source footnote */
         .data-source {
             font-size: 11px;
-            color: #666;
+            color: #999;
             text-align: center;
             margin-top: 20px;
             line-height: 1.5;
@@ -340,7 +340,7 @@
             font-size: 16px;
             font-weight: 700;
             background: var(--accent);
-            color: #000;
+            color: #1a1a1a;
             border: none;
             border-radius: 10px;
             cursor: pointer;
@@ -350,7 +350,7 @@
         .cta-section .btn-cta:hover {
             background: var(--accent-hover);
             transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(245,197,24,0.3);
+            box-shadow: 0 4px 12px rgba(245,197,24,0.4);
         }
         .btn-restart {
             display: inline-block;
@@ -742,20 +742,20 @@
 
                 <div class="result-card current">
                     <div class="result-label">Your GCI last year</div>
-                    <div class="result-value">${formatMoney(currentIncome)}<span style="font-size:16px;font-weight:400;color:#a0a0a0">/yr</span></div>
+                    <div class="result-value">${formatMoney(currentIncome)}<span style="font-size:16px;font-weight:400;color:#777">/yr</span></div>
                     <div class="result-detail">${actualDeals} transactions at ${formatMoney(gciPerDeal)} per deal</div>
                 </div>
 
                 <div class="result-card potential">
                     <div class="result-label">What your network could generate</div>
-                    <div class="result-value">${formatMoney(potentialIncome)}<span style="font-size:16px;font-weight:400;color:#a0a0a0">/yr</span></div>
+                    <div class="result-value">${formatMoney(potentialIncome)}<span style="font-size:16px;font-weight:400;color:#777">/yr</span></div>
                     <div class="result-detail">~${potentialTotalDeals.toFixed(1)} transactions/year when your sphere and past clients are properly nurtured</div>
                 </div>
 
                 ${gap > 0 ? `
                 <div class="result-card gap">
                     <div class="result-label">You're leaving on the table</div>
-                    <div class="result-value">${formatMoney(gap)}<span style="font-size:16px;font-weight:400;color:#a0a0a0">/yr</span></div>
+                    <div class="result-value">${formatMoney(gap)}<span style="font-size:16px;font-weight:400;color:#777">/yr</span></div>
                     <div class="result-detail">That's ~${gapDeals.toFixed(1)} extra deals per year sitting in your phone right now</div>
                 </div>
                 ` : ''}
