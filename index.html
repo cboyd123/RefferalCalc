@@ -6,17 +6,17 @@
     <title>Realtor Referral Earnings Calculator</title>
     <style>
         :root {
-            --primary: #1a2b4a;
-            --accent: #2c6fbb;
-            --accent-hover: #1e5a9e;
-            --success: #16a34a;
+            --primary: #ffffff;
+            --accent: #f5c518;
+            --accent-hover: #d4a90e;
+            --success: #f5c518;
             --warning: #dc2626;
-            --bg: #f8fafc;
-            --card-bg: #ffffff;
-            --text: #1e293b;
-            --text-muted: #64748b;
-            --border: #e2e8f0;
-            --shadow: 0 4px 24px rgba(0,0,0,0.08);
+            --bg: #000000;
+            --card-bg: #111111;
+            --text: #ffffff;
+            --text-muted: #a0a0a0;
+            --border: #2a2a2a;
+            --shadow: 0 4px 24px rgba(0,0,0,0.4);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -85,7 +85,7 @@
 
         .step-context a {
             color: var(--accent);
-            text-decoration: none;
+            text-decoration: underline;
         }
 
         /* Form inputs */
@@ -120,7 +120,7 @@
         }
 
         .input-group input::placeholder {
-            color: #94a3b8;
+            color: #555;
         }
 
         .input-prefix {
@@ -176,11 +176,11 @@
         }
         .option-card:hover {
             border-color: var(--accent);
-            background: #f0f7ff;
+            background: #1a1a00;
         }
         .option-card.selected {
             border-color: var(--accent);
-            background: #e8f1fc;
+            background: #2a2500;
             color: var(--accent);
         }
 
@@ -203,21 +203,23 @@
 
         .btn-primary {
             background: var(--accent);
-            color: #fff;
+            color: #000;
             flex: 1;
+            font-weight: 700;
         }
         .btn-primary:hover { background: var(--accent-hover); }
         .btn-primary:disabled {
-            background: #94a3b8;
+            background: #444;
+            color: #888;
             cursor: not-allowed;
         }
 
         .btn-back {
-            background: var(--bg);
+            background: transparent;
             color: var(--text-muted);
             border: 2px solid var(--border);
         }
-        .btn-back:hover { background: var(--border); }
+        .btn-back:hover { background: #222; }
 
         /* Results page */
         .results-section { display: none; }
@@ -243,16 +245,16 @@
         }
 
         .result-card.current {
-            background: #fef2f2;
-            border: 1px solid #fecaca;
+            background: #1a1111;
+            border: 1px solid #3a2020;
         }
         .result-card.potential {
-            background: #f0fdf4;
-            border: 1px solid #bbf7d0;
+            background: #112211;
+            border: 1px solid #1a3a1a;
         }
         .result-card.gap {
-            background: #fefce8;
-            border: 1px solid #fef08a;
+            background: #1a1800;
+            border: 1px solid #3a3200;
         }
 
         .result-label {
@@ -262,17 +264,17 @@
             letter-spacing: 1px;
             margin-bottom: 4px;
         }
-        .result-card.current .result-label { color: #991b1b; }
-        .result-card.potential .result-label { color: #166534; }
-        .result-card.gap .result-label { color: #854d0e; }
+        .result-card.current .result-label { color: #ff6b6b; }
+        .result-card.potential .result-label { color: #4ade80; }
+        .result-card.gap .result-label { color: #f5c518; }
 
         .result-value {
             font-size: 32px;
             font-weight: 800;
         }
-        .result-card.current .result-value { color: var(--warning); }
-        .result-card.potential .result-value { color: var(--success); }
-        .result-card.gap .result-value { color: #ca8a04; }
+        .result-card.current .result-value { color: #ff6b6b; }
+        .result-card.potential .result-value { color: #4ade80; }
+        .result-card.gap .result-value { color: #f5c518; }
 
         .result-detail {
             font-size: 13px;
@@ -305,14 +307,14 @@
         .breakdown-row .label { color: var(--text-muted); }
         .breakdown-row .value { font-weight: 600; color: var(--text); }
         .breakdown-row.highlight {
-            background: #f0fdf4;
+            background: #112211;
         }
-        .breakdown-row.highlight .value { color: var(--success); font-weight: 700; }
+        .breakdown-row.highlight .value { color: #4ade80; font-weight: 700; }
 
         /* Source footnote */
         .data-source {
             font-size: 11px;
-            color: #94a3b8;
+            color: #666;
             text-align: center;
             margin-top: 20px;
             line-height: 1.5;
@@ -338,7 +340,7 @@
             font-size: 16px;
             font-weight: 700;
             background: var(--accent);
-            color: #fff;
+            color: #000;
             border: none;
             border-radius: 10px;
             cursor: pointer;
@@ -348,7 +350,7 @@
         .cta-section .btn-cta:hover {
             background: var(--accent-hover);
             transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(44,111,187,0.3);
+            box-shadow: 0 4px 12px rgba(245,197,24,0.3);
         }
         .btn-restart {
             display: inline-block;
@@ -396,7 +398,7 @@
 (function() {
     // ==================== CONFIG ====================
     // Update this URL to your actual booking page
-    const BOOKING_URL = '#';
+    const BOOKING_URL = 'https://5dwhdnnocmn.typeform.com/to/TEzPcxMI';
 
     // Industry benchmarks (NAR + real estate coaching data)
     const BENCHMARKS = {
@@ -740,20 +742,20 @@
 
                 <div class="result-card current">
                     <div class="result-label">Your GCI last year</div>
-                    <div class="result-value">${formatMoney(currentIncome)}<span style="font-size:16px;font-weight:400;color:#64748b">/yr</span></div>
+                    <div class="result-value">${formatMoney(currentIncome)}<span style="font-size:16px;font-weight:400;color:#a0a0a0">/yr</span></div>
                     <div class="result-detail">${actualDeals} transactions at ${formatMoney(gciPerDeal)} per deal</div>
                 </div>
 
                 <div class="result-card potential">
                     <div class="result-label">What your network could generate</div>
-                    <div class="result-value">${formatMoney(potentialIncome)}<span style="font-size:16px;font-weight:400;color:#64748b">/yr</span></div>
+                    <div class="result-value">${formatMoney(potentialIncome)}<span style="font-size:16px;font-weight:400;color:#a0a0a0">/yr</span></div>
                     <div class="result-detail">~${potentialTotalDeals.toFixed(1)} transactions/year when your sphere and past clients are properly nurtured</div>
                 </div>
 
                 ${gap > 0 ? `
                 <div class="result-card gap">
                     <div class="result-label">You're leaving on the table</div>
-                    <div class="result-value">${formatMoney(gap)}<span style="font-size:16px;font-weight:400;color:#64748b">/yr</span></div>
+                    <div class="result-value">${formatMoney(gap)}<span style="font-size:16px;font-weight:400;color:#a0a0a0">/yr</span></div>
                     <div class="result-detail">That's ~${gapDeals.toFixed(1)} extra deals per year sitting in your phone right now</div>
                 </div>
                 ` : ''}
