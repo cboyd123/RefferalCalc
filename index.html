@@ -465,7 +465,7 @@
             id: 'sphere',
             render: () => `
                 <div class="step">
-                    <div class="step-counter">Step 1 of 5</div>
+                    <div class="step-counter">Step 1 of 6</div>
                     <div class="step-question">How many people are in your sphere of influence?</div>
                     <p class="step-context">
                         Think broadly: friends, family, neighbors, gym buddies, parents from your kids' school,
@@ -492,7 +492,7 @@
             id: 'pastClients',
             render: () => `
                 <div class="step">
-                    <div class="step-counter">Step 2 of 5</div>
+                    <div class="step-counter">Step 2 of 6</div>
                     <div class="step-question">How many past clients do you have?</div>
                     <p class="step-context">
                         Total number of people you've helped buy or sell — over your entire career.
@@ -515,10 +515,36 @@
             }
         },
         {
+            id: 'transactions',
+            render: () => `
+                <div class="step">
+                    <div class="step-counter">Step 3 of 6</div>
+                    <div class="step-question">How many transactions did you close last year?</div>
+                    <p class="step-context">
+                        Count each side — if you helped someone buy and someone else sell, that's 2.
+                        Be honest. This is just to show you the real gap.
+                    </p>
+                    <div class="input-group">
+                        <input type="number" id="transactionsLastYear" placeholder="e.g. 8" min="0" value="${esc(state.data.transactionsLastYear)}" autofocus>
+                    </div>
+                    <div class="btn-row">
+                        <button class="btn btn-back" id="btnBack">Back</button>
+                        <button class="btn btn-primary" id="btnNext">Next</button>
+                    </div>
+                </div>
+            `,
+            validate: () => {
+                const v = document.getElementById('transactionsLastYear').value.trim();
+                if (!v || isNaN(v) || Number(v) < 0) return 'Enter how many deals you closed last year.';
+                state.data.transactionsLastYear = v;
+                return true;
+            }
+        },
+        {
             id: 'market',
             render: () => `
                 <div class="step">
-                    <div class="step-counter">Step 3 of 5</div>
+                    <div class="step-counter">Step 4 of 6</div>
                     <div class="step-question">What's the average home price in your market?</div>
                     <p class="step-context">
                         A rough average is fine. Think about the typical sale price of homes you work with.
@@ -546,7 +572,7 @@
             id: 'commission',
             render: () => `
                 <div class="step">
-                    <div class="step-counter">Step 4 of 5</div>
+                    <div class="step-counter">Step 5 of 6</div>
                     <div class="step-question">What's your average commission per side?</div>
                     <p class="step-context">
                         Your gross commission percentage per transaction (before splits/fees).
@@ -574,7 +600,7 @@
             id: 'followup',
             render: () => `
                 <div class="step">
-                    <div class="step-counter">Step 5 of 5</div>
+                    <div class="step-counter">Step 6 of 6</div>
                     <div class="step-question">Do you have a consistent follow-up system for your sphere and past clients?</div>
                     <p class="step-context">
                         Be honest — this means regular touchpoints (monthly+), not just holiday cards.
@@ -616,7 +642,7 @@
         }
     ];
 
-    const TOTAL_INPUT_STEPS = 6; // intro + 5 questions (results not counted)
+    const TOTAL_INPUT_STEPS = 7; // intro + 6 questions (results not counted)
 
     // ==================== RENDER ====================
     function renderStep() {
@@ -686,48 +712,42 @@
         const d = state.data;
         const sphere = Number(d.sphereSize);
         const pastClients = Number(d.pastClients);
+        const actualDeals = Number(d.transactionsLastYear);
         const homePrice = Number(d.avgHomePrice);
         const commission = Number(d.commissionPct) / 100;
-        const hasFollowUp = d.hasFollowUp;
 
         const gciPerDeal = homePrice * commission;
 
-        // Current estimated production from network
-        const currentSphereRate = hasFollowUp ? BENCHMARKS.sphereNurturedRate : BENCHMARKS.sphereNeglectedRate;
-        const currentPCRate = hasFollowUp ? BENCHMARKS.pastClientNurturedRate : BENCHMARKS.pastClientNeglectedRate;
+        // ACTUAL income based on their real numbers
+        const currentIncome = actualDeals * gciPerDeal;
 
-        const currentSphereDeals = sphere * currentSphereRate;
-        const currentPCDeals = pastClients * currentPCRate;
-        const currentTotalDeals = currentSphereDeals + currentPCDeals;
-        const currentIncome = currentTotalDeals * gciPerDeal;
-
-        // Potential with proper nurturing
+        // Potential with proper nurturing of sphere + past clients
         const potentialSphereDeals = sphere * BENCHMARKS.sphereNurturedRate;
         const potentialPCDeals = pastClients * BENCHMARKS.pastClientNurturedRate;
         const potentialTotalDeals = potentialSphereDeals + potentialPCDeals;
         const potentialIncome = potentialTotalDeals * gciPerDeal;
 
-        // Gap
+        // Gap = what they could be making minus what they actually made
         const gap = potentialIncome - currentIncome;
-        const gapDeals = potentialTotalDeals - currentTotalDeals;
+        const gapDeals = potentialTotalDeals - actualDeals;
 
         return `
             <div class="step results-section" style="display:block;">
                 <div class="results-header">
                     <h2>${esc(d.firstName)}, here's what your network is worth.</h2>
-                    <p>Based on your inputs and NAR industry data</p>
+                    <p>Based on your numbers and NAR industry data</p>
                 </div>
 
                 <div class="result-card current">
-                    <div class="result-label">${hasFollowUp ? 'Current estimated referral income' : 'Estimated income without follow-up'}</div>
+                    <div class="result-label">Your GCI last year</div>
                     <div class="result-value">${formatMoney(currentIncome)}<span style="font-size:16px;font-weight:400;color:#64748b">/yr</span></div>
-                    <div class="result-detail">~${currentTotalDeals.toFixed(1)} transactions/year from your network at current engagement</div>
+                    <div class="result-detail">${actualDeals} transactions at ${formatMoney(gciPerDeal)} per deal</div>
                 </div>
 
                 <div class="result-card potential">
-                    <div class="result-label">Potential with consistent nurturing</div>
+                    <div class="result-label">What your network could generate</div>
                     <div class="result-value">${formatMoney(potentialIncome)}<span style="font-size:16px;font-weight:400;color:#64748b">/yr</span></div>
-                    <div class="result-detail">~${potentialTotalDeals.toFixed(1)} transactions/year when your sphere and past clients are properly engaged</div>
+                    <div class="result-detail">~${potentialTotalDeals.toFixed(1)} transactions/year when your sphere and past clients are properly nurtured</div>
                 </div>
 
                 ${gap > 0 ? `
@@ -741,12 +761,8 @@
                 <div class="breakdown">
                     <div class="breakdown-title">How we calculated this</div>
                     <div class="breakdown-row">
-                        <span class="label">Sphere of influence</span>
-                        <span class="value">${sphere.toLocaleString()} people</span>
-                    </div>
-                    <div class="breakdown-row">
-                        <span class="label">Past clients</span>
-                        <span class="value">${pastClients.toLocaleString()} people</span>
+                        <span class="label">Your transactions last year</span>
+                        <span class="value">${actualDeals} deals</span>
                     </div>
                     <div class="breakdown-row">
                         <span class="label">Avg home price</span>
@@ -757,20 +773,28 @@
                         <span class="value">${formatMoney(gciPerDeal)}</span>
                     </div>
                     <div class="breakdown-row">
-                        <span class="label">Sphere conversion (${hasFollowUp ? 'nurtured' : 'current'})</span>
-                        <span class="value">${(currentSphereRate * 100).toFixed(1)}% → ${currentSphereDeals.toFixed(1)} deals</span>
+                        <span class="label">Your GCI last year</span>
+                        <span class="value">${formatMoney(currentIncome)}</span>
+                    </div>
+                    <div class="breakdown-row" style="border-top:2px solid var(--border);margin-top:4px;padding-top:14px;">
+                        <span class="label">Sphere of influence</span>
+                        <span class="value">${sphere.toLocaleString()} people</span>
                     </div>
                     <div class="breakdown-row">
-                        <span class="label">Past client conversion (${hasFollowUp ? 'nurtured' : 'current'})</span>
-                        <span class="value">${(currentPCRate * 100).toFixed(1)}% → ${currentPCDeals.toFixed(1)} deals</span>
+                        <span class="label">Past clients</span>
+                        <span class="value">${pastClients.toLocaleString()} people</span>
                     </div>
                     <div class="breakdown-row highlight">
                         <span class="label">Sphere potential (nurtured at 4%)</span>
-                        <span class="value">${potentialSphereDeals.toFixed(1)} deals → ${formatMoney(potentialSphereDeals * gciPerDeal)}</span>
+                        <span class="value">${potentialSphereDeals.toFixed(1)} deals &rarr; ${formatMoney(potentialSphereDeals * gciPerDeal)}</span>
                     </div>
                     <div class="breakdown-row highlight">
                         <span class="label">Past client potential (nurtured at 12%)</span>
-                        <span class="value">${potentialPCDeals.toFixed(1)} deals → ${formatMoney(potentialPCDeals * gciPerDeal)}</span>
+                        <span class="value">${potentialPCDeals.toFixed(1)} deals &rarr; ${formatMoney(potentialPCDeals * gciPerDeal)}</span>
+                    </div>
+                    <div class="breakdown-row" style="border-top:2px solid var(--border);margin-top:4px;padding-top:14px;">
+                        <span class="label"><strong>Total network potential</strong></span>
+                        <span class="value" style="color:var(--success);font-weight:800;">${potentialTotalDeals.toFixed(1)} deals &rarr; ${formatMoney(potentialIncome)}</span>
                     </div>
                 </div>
 
@@ -781,7 +805,7 @@
 
                 <div class="cta-section">
                     <p>
-                        <strong>${gap > 0 ? formatMoney(gap) + ' is a lot to leave on the table.' : 'Great job nurturing your network.'}</strong><br>
+                        <strong>${gap > 0 ? formatMoney(gap) + ' is a lot to leave on the table.' : 'Great job — you\'re capturing your network\'s potential.'}</strong><br>
                         ${gap > 0
                             ? "Let's build a plan to capture it — no fluff, just a system that works."
                             : "Let's talk about how to maintain and grow these numbers even further."
