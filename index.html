@@ -184,6 +184,16 @@
             color: #1a1a1a;
         }
 
+        /* Stacked option cards (for 3-4 choices) */
+        .option-cards-stacked {
+            flex-direction: column;
+        }
+        .option-cards-stacked .option-card {
+            flex: none;
+            text-align: left;
+            padding: 14px 18px;
+        }
+
         /* Buttons */
         .btn-row {
             display: flex;
@@ -626,16 +636,72 @@
 
     // Industry benchmarks (NAR + real estate coaching data)
     const BENCHMARKS = {
-        // A well-nurtured sphere converts at ~2 transactions per 50 contacts/year
-        sphereNurturedRate: 0.04,
-        // Without nurturing, sphere converts at roughly 0.5-1%
-        sphereNeglectedRate: 0.007,
-        // Past clients with consistent follow-up: ~12% repeat/referral rate per year
-        pastClientNurturedRate: 0.12,
-        // Past clients without follow-up: ~3-4% per year
-        pastClientNeglectedRate: 0.035,
-        // Referral sources: NAR 2024 Profile of Home Buyers and Sellers
+        // Sphere: conversion rate by touch frequency
+        sphereNurturedRate: 0.04,       // monthly+ contact
+        sphereQuarterlyRate: 0.025,     // every few months
+        sphereYearlyRate: 0.015,        // once or twice a year
+        sphereNeglectedRate: 0.007,     // rarely or never
+
+        // Past clients: repeat/referral rate by touch frequency
+        pastClientNurturedRate: 0.12,   // monthly+ contact
+        pastClientQuarterlyRate: 0.08,  // every few months
+        pastClientYearlyRate: 0.05,     // once or twice a year
+        pastClientNeglectedRate: 0.035, // rarely or never
+        // Sources: NAR 2024 Profile of Home Buyers and Sellers
     };
+
+    // ==================== FREQUENCY HELPERS ====================
+    function shouldShowStruggle() {
+        const sf = state.data.sphereFrequency;
+        const pcf = state.data.pastClientFrequency;
+        return sf === 'yearly' || sf === 'rarely' ||
+               pcf === 'yearly' || pcf === 'rarely';
+    }
+
+    function getConversionRates() {
+        const sphereRates = {
+            monthly:   BENCHMARKS.sphereNurturedRate,
+            quarterly: BENCHMARKS.sphereQuarterlyRate,
+            yearly:    BENCHMARKS.sphereYearlyRate,
+            rarely:    BENCHMARKS.sphereNeglectedRate,
+        };
+        const pcRates = {
+            monthly:   BENCHMARKS.pastClientNurturedRate,
+            quarterly: BENCHMARKS.pastClientQuarterlyRate,
+            yearly:    BENCHMARKS.pastClientYearlyRate,
+            rarely:    BENCHMARKS.pastClientNeglectedRate,
+        };
+        return {
+            sphereRate:     sphereRates[state.data.sphereFrequency] || BENCHMARKS.sphereNeglectedRate,
+            pastClientRate: pcRates[state.data.pastClientFrequency] || BENCHMARKS.pastClientNeglectedRate,
+        };
+    }
+
+    function getVisibleInputStepCount() {
+        return shouldShowStruggle() ? 8 : 7;
+    }
+
+    function getStepCounterLabel(n) {
+        return 'Step ' + n + ' of ' + getVisibleInputStepCount();
+    }
+
+    function getProgressPercent() {
+        if (state.currentStep === 0) return 0;
+        if (state.currentStep >= 9) return 100;
+        // With struggle: 9 input steps (0-8), without: 8 (0-7, skip 8)
+        const total = shouldShowStruggle() ? 9 : 8;
+        return (state.currentStep / total) * 100;
+    }
+
+    function getFrequencyLabel(freq) {
+        const labels = {
+            monthly: 'monthly+',
+            quarterly: 'every few months',
+            yearly: 'once or twice/yr',
+            rarely: 'rarely/never'
+        };
+        return labels[freq] || 'unknown';
+    }
 
     // ==================== STATE ====================
     const state = {
@@ -648,7 +714,9 @@
             avgHomePrice: '',
             commissionPct: '',
             transactionsLastYear: '',
-            hasFollowUp: null
+            sphereFrequency: null,
+            pastClientFrequency: null,
+            struggleReason: null
         }
     };
 
@@ -691,7 +759,7 @@
             id: 'sphere',
             render: () => `
                 <div class="step">
-                    <div class="step-counter">Step 1 of 6</div>
+                    <div class="step-counter">${getStepCounterLabel(1)}</div>
                     <div class="step-question">How many people are in your sphere of influence?</div>
                     <p class="step-context">
                         Think broadly: friends, family, neighbors, gym buddies, parents from your kids' school,
@@ -718,7 +786,7 @@
             id: 'pastClients',
             render: () => `
                 <div class="step">
-                    <div class="step-counter">Step 2 of 6</div>
+                    <div class="step-counter">${getStepCounterLabel(2)}</div>
                     <div class="step-question">How many past clients do you have?</div>
                     <p class="step-context">
                         Total number of people you've helped buy or sell — over your entire career.
@@ -744,7 +812,7 @@
             id: 'transactions',
             render: () => `
                 <div class="step">
-                    <div class="step-counter">Step 3 of 6</div>
+                    <div class="step-counter">${getStepCounterLabel(3)}</div>
                     <div class="step-question">How many transactions did you close last year?</div>
                     <p class="step-context">
                         Count each side — if you helped someone buy and someone else sell, that's 2.
@@ -770,7 +838,7 @@
             id: 'market',
             render: () => `
                 <div class="step">
-                    <div class="step-counter">Step 4 of 6</div>
+                    <div class="step-counter">${getStepCounterLabel(4)}</div>
                     <div class="step-question">What's the average home price in your market?</div>
                     <p class="step-context">
                         A rough average is fine. Think about the typical sale price of homes you work with.
@@ -798,7 +866,7 @@
             id: 'commission',
             render: () => `
                 <div class="step">
-                    <div class="step-counter">Step 5 of 6</div>
+                    <div class="step-counter">${getStepCounterLabel(5)}</div>
                     <div class="step-question">What's your average commission per side?</div>
                     <p class="step-context">
                         Your gross commission percentage per transaction (before splits/fees).
@@ -823,39 +891,113 @@
             }
         },
         {
-            id: 'followup',
+            id: 'sphereFrequency',
             render: () => `
                 <div class="step">
-                    <div class="step-counter">Step 6 of 6</div>
-                    <div class="step-question">Do you have a consistent follow-up system for your sphere and past clients?</div>
+                    <div class="step-counter">${getStepCounterLabel(6)}</div>
+                    <div class="step-question">How often do you reach out to your entire sphere?</div>
                     <p class="step-context">
-                        Be honest — this means regular touchpoints (monthly+), not just holiday cards.
-                        Think: calls, texts, events, mailers, pop-bys on a consistent schedule.
+                        Think about intentional touchpoints — calls, texts, mailers, events, social media DMs.
+                        Not just passive posts, but direct outreach to stay top of mind.
                     </p>
-                    <div class="option-cards" id="followUpOptions">
-                        <div class="option-card ${state.data.hasFollowUp === true ? 'selected' : ''}" data-value="yes">
-                            Yes, consistently
-                        </div>
-                        <div class="option-card ${state.data.hasFollowUp === false ? 'selected' : ''}" data-value="no">
-                            Not really
-                        </div>
+                    <div class="option-cards option-cards-stacked" id="sphereFreqOptions">
+                        <div class="option-card ${state.data.sphereFrequency === 'monthly' ? 'selected' : ''}" data-value="monthly">Monthly or more</div>
+                        <div class="option-card ${state.data.sphereFrequency === 'quarterly' ? 'selected' : ''}" data-value="quarterly">Every few months</div>
+                        <div class="option-card ${state.data.sphereFrequency === 'yearly' ? 'selected' : ''}" data-value="yearly">Once or twice a year</div>
+                        <div class="option-card ${state.data.sphereFrequency === 'rarely' ? 'selected' : ''}" data-value="rarely">Rarely or never</div>
                     </div>
                     <div class="btn-row">
                         <button class="btn btn-back" id="btnBack">Back</button>
-                        <button class="btn btn-primary" id="btnNext" ${state.data.hasFollowUp === null ? 'disabled' : ''}>See my results</button>
+                        <button class="btn btn-primary" id="btnNext" ${!state.data.sphereFrequency ? 'disabled' : ''}>Next</button>
                     </div>
                 </div>
             `,
             validate: () => {
-                if (state.data.hasFollowUp === null) return 'Select one of the options.';
+                if (!state.data.sphereFrequency) return 'Select how often you reach out to your sphere.';
                 return true;
             },
             afterRender: () => {
-                document.querySelectorAll('.option-card').forEach(card => {
+                document.querySelectorAll('#sphereFreqOptions .option-card').forEach(card => {
                     card.addEventListener('click', () => {
-                        document.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
+                        document.querySelectorAll('#sphereFreqOptions .option-card').forEach(c => c.classList.remove('selected'));
                         card.classList.add('selected');
-                        state.data.hasFollowUp = card.dataset.value === 'yes';
+                        state.data.sphereFrequency = card.dataset.value;
+                        document.getElementById('btnNext').disabled = false;
+                    });
+                });
+            }
+        },
+        {
+            id: 'pastClientFrequency',
+            render: () => `
+                <div class="step">
+                    <div class="step-counter">${getStepCounterLabel(7)}</div>
+                    <div class="step-question">How often do you stay in touch with past clients?</div>
+                    <p class="step-context">
+                        Past clients are your highest-converting group. Count any intentional outreach —
+                        check-in calls, home anniversary notes, market updates, or client events.
+                    </p>
+                    <div class="option-cards option-cards-stacked" id="pcFreqOptions">
+                        <div class="option-card ${state.data.pastClientFrequency === 'monthly' ? 'selected' : ''}" data-value="monthly">Monthly or more</div>
+                        <div class="option-card ${state.data.pastClientFrequency === 'quarterly' ? 'selected' : ''}" data-value="quarterly">Every few months</div>
+                        <div class="option-card ${state.data.pastClientFrequency === 'yearly' ? 'selected' : ''}" data-value="yearly">Once or twice a year</div>
+                        <div class="option-card ${state.data.pastClientFrequency === 'rarely' ? 'selected' : ''}" data-value="rarely">Rarely or never</div>
+                    </div>
+                    <div class="btn-row">
+                        <button class="btn btn-back" id="btnBack">Back</button>
+                        <button class="btn btn-primary" id="btnNext" ${!state.data.pastClientFrequency ? 'disabled' : ''}>${shouldShowStruggle() ? 'Next' : 'See my results'}</button>
+                    </div>
+                </div>
+            `,
+            validate: () => {
+                if (!state.data.pastClientFrequency) return 'Select how often you stay in touch with past clients.';
+                if (!shouldShowStruggle()) state.data.struggleReason = null;
+                return true;
+            },
+            afterRender: () => {
+                document.querySelectorAll('#pcFreqOptions .option-card').forEach(card => {
+                    card.addEventListener('click', () => {
+                        document.querySelectorAll('#pcFreqOptions .option-card').forEach(c => c.classList.remove('selected'));
+                        card.classList.add('selected');
+                        state.data.pastClientFrequency = card.dataset.value;
+                        const btn = document.getElementById('btnNext');
+                        btn.disabled = false;
+                        btn.textContent = shouldShowStruggle() ? 'Next' : 'See my results';
+                    });
+                });
+            }
+        },
+        {
+            id: 'struggleReason',
+            render: () => `
+                <div class="step">
+                    <div class="step-counter">${getStepCounterLabel(8)}</div>
+                    <div class="step-question">What's the biggest reason you struggle to stay in touch?</div>
+                    <p class="step-context">
+                        No judgment — most agents deal with this. Knowing the real blocker
+                        helps us show you the right solution.
+                    </p>
+                    <div class="option-cards option-cards-stacked" id="struggleOptions">
+                        <div class="option-card ${state.data.struggleReason === 'time' ? 'selected' : ''}" data-value="time">Not enough time</div>
+                        <div class="option-card ${state.data.struggleReason === 'unsure' ? 'selected' : ''}" data-value="unsure">Not sure what to say or do</div>
+                        <div class="option-card ${state.data.struggleReason === 'inconsistent' ? 'selected' : ''}" data-value="inconsistent">I start but can't stay consistent</div>
+                    </div>
+                    <div class="btn-row">
+                        <button class="btn btn-back" id="btnBack">Back</button>
+                        <button class="btn btn-primary" id="btnNext" ${!state.data.struggleReason ? 'disabled' : ''}>See my results</button>
+                    </div>
+                </div>
+            `,
+            validate: () => {
+                if (!state.data.struggleReason) return 'Select the option that resonates most.';
+                return true;
+            },
+            afterRender: () => {
+                document.querySelectorAll('#struggleOptions .option-card').forEach(card => {
+                    card.addEventListener('click', () => {
+                        document.querySelectorAll('#struggleOptions .option-card').forEach(c => c.classList.remove('selected'));
+                        card.classList.add('selected');
+                        state.data.struggleReason = card.dataset.value;
                         document.getElementById('btnNext').disabled = false;
                     });
                 });
@@ -867,8 +1009,6 @@
             validate: () => true
         }
     ];
-
-    const TOTAL_INPUT_STEPS = 7; // intro + 6 questions (results not counted)
 
     // ==================== HERO LANDING PAGE ====================
     function renderHeroPage() {
@@ -1020,7 +1160,7 @@
         if (hero) hero.remove();
 
         container.innerHTML = step.render();
-        progress.style.width = `${(state.currentStep / TOTAL_INPUT_STEPS) * 100}%`;
+        progress.style.width = `${getProgressPercent()}%`;
 
         // Wire up buttons
         const btnNext = document.getElementById('btnNext');
@@ -1035,6 +1175,11 @@
                 }
                 clearError();
                 state.currentStep++;
+                // Skip struggle step (8) if not needed
+                if (state.currentStep === 8 && !shouldShowStruggle()) {
+                    state.data.struggleReason = null;
+                    state.currentStep++;
+                }
                 renderStep();
             });
         }
@@ -1042,6 +1187,10 @@
         if (btnBack) {
             btnBack.addEventListener('click', () => {
                 state.currentStep--;
+                // Skip struggle step (8) when going back if not needed
+                if (state.currentStep === 8 && !shouldShowStruggle()) {
+                    state.currentStep--;
+                }
                 renderStep();
             });
         }
@@ -1090,9 +1239,10 @@
         // ACTUAL income based on their real numbers
         const currentIncome = actualDeals * gciPerDeal;
 
-        // Potential with proper nurturing of sphere + past clients
-        const potentialSphereDeals = sphere * BENCHMARKS.sphereNurturedRate;
-        const potentialPCDeals = pastClients * BENCHMARKS.pastClientNurturedRate;
+        // Potential based on their stated touch frequency
+        const rates = getConversionRates();
+        const potentialSphereDeals = sphere * rates.sphereRate;
+        const potentialPCDeals = pastClients * rates.pastClientRate;
         const potentialTotalDeals = potentialSphereDeals + potentialPCDeals;
         const potentialIncome = potentialTotalDeals * gciPerDeal;
 
@@ -1116,7 +1266,7 @@
                 <div class="result-card potential">
                     <div class="result-label">What your network could generate</div>
                     <div class="result-value">${formatMoney(potentialIncome)}<span style="font-size:16px;font-weight:400;color:#777">/yr</span></div>
-                    <div class="result-detail">~${potentialTotalDeals.toFixed(1)} transactions/year when your sphere and past clients are properly nurtured</div>
+                    <div class="result-detail">~${potentialTotalDeals.toFixed(1)} transactions/year based on your current outreach frequency</div>
                 </div>
 
                 ${gap > 0 ? `
@@ -1154,11 +1304,11 @@
                         <span class="value">${pastClients.toLocaleString()} people</span>
                     </div>
                     <div class="breakdown-row highlight">
-                        <span class="label">Sphere potential (nurtured at 4%)</span>
+                        <span class="label">Sphere potential (${getFrequencyLabel(d.sphereFrequency)} = ${(rates.sphereRate * 100).toFixed(1)}%)</span>
                         <span class="value">${potentialSphereDeals.toFixed(1)} deals &rarr; ${formatMoney(potentialSphereDeals * gciPerDeal)}</span>
                     </div>
                     <div class="breakdown-row highlight">
-                        <span class="label">Past client potential (nurtured at 12%)</span>
+                        <span class="label">Past clients (${getFrequencyLabel(d.pastClientFrequency)} = ${(rates.pastClientRate * 100).toFixed(1)}%)</span>
                         <span class="value">${potentialPCDeals.toFixed(1)} deals &rarr; ${formatMoney(potentialPCDeals * gciPerDeal)}</span>
                     </div>
                     <div class="breakdown-row" style="border-top:2px solid var(--border);margin-top:4px;padding-top:14px;">
@@ -1198,8 +1348,9 @@
         const commission = Number(d.commissionPct) / 100;
         const gciPerDeal = homePrice * commission;
         const currentIncome = actualDeals * gciPerDeal;
-        const potentialSphereDeals = sphere * BENCHMARKS.sphereNurturedRate;
-        const potentialPCDeals = pastClients * BENCHMARKS.pastClientNurturedRate;
+        const rates = getConversionRates();
+        const potentialSphereDeals = sphere * rates.sphereRate;
+        const potentialPCDeals = pastClients * rates.pastClientRate;
         const potentialTotalDeals = potentialSphereDeals + potentialPCDeals;
         const potentialIncome = potentialTotalDeals * gciPerDeal;
         const gap = potentialIncome - currentIncome;
@@ -1221,7 +1372,9 @@
                     'Transactions Last Year': actualDeals,
                     'Avg Home Price': homePrice,
                     'Commission %': Number(d.commissionPct),
-                    'Has Follow-Up System': d.hasFollowUp ? 'Yes' : 'No',
+                    'Sphere Touch Frequency': d.sphereFrequency || '',
+                    'Past Client Touch Frequency': d.pastClientFrequency || '',
+                    'Struggle Reason': d.struggleReason || '',
                     'GCI Per Deal': Math.round(gciPerDeal),
                     'Current GCI': Math.round(currentIncome),
                     'Potential GCI': Math.round(potentialIncome),
@@ -1269,7 +1422,9 @@
                 avgHomePrice: '',
                 commissionPct: '',
                 transactionsLastYear: '',
-                hasFollowUp: null
+                sphereFrequency: null,
+                pastClientFrequency: null,
+                struggleReason: null
             };
             window.scrollTo({ top: 0, behavior: 'instant' });
             renderStep();
