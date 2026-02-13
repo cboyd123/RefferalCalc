@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nashville Home Pricing Tool</title>
+    <link rel="stylesheet" href="css/shared.css">
+</head>
+<body>
+
+<!-- Navigation -->
+<nav class="top-nav">
+    <a href="pricing.html" class="top-nav-brand">Nashville <span>PricePro</span></a>
+    <div class="top-nav-links">
+        <a href="pricing.html" class="active">Pricing Tool</a>
+        <a href="index.html">Referral Calculator</a>
+    </div>
+</nav>
+
+<!-- ==================== INPUT VIEW ==================== -->
+<div id="inputView" class="page-container">
+    <h1 class="page-title">Price a Home</h1>
+    <p class="page-subtitle">Enter the subject property details below. We'll analyze comps using CMA methodology and recommend a price range.</p>
+
+    <!-- Location Section -->
+    <div class="form-card">
+        <div class="form-section-title">Location</div>
+        <div class="form-grid">
+            <div class="full-width input-group">
+                <label for="address">Street Address</label>
+                <input type="text" id="address" placeholder="e.g. 1234 Shelby Ave">
+            </div>
+            <div class="input-group">
+                <label for="zip">Zip Code</label>
+                <input type="text" id="zip" placeholder="e.g. 37206" maxlength="5">
+            </div>
+            <div class="input-group">
+                <label for="neighborhood">Neighborhood</label>
+                <select id="neighborhood">
+                    <option value="">Select neighborhood...</option>
+                    <option value="East Nashville">East Nashville</option>
+                    <option value="The Nations">The Nations</option>
+                    <option value="Germantown">Germantown</option>
+                    <option value="Sylvan Park">Sylvan Park</option>
+                    <option value="Charlotte Park">Charlotte Park</option>
+                    <option value="Wedgewood-Houston">Wedgewood-Houston</option>
+                    <option value="12 South">12 South</option>
+                    <option value="Berry Hill">Berry Hill</option>
+                    <option value="Melrose">Melrose</option>
+                    <option value="North Nashville">North Nashville</option>
+                    <option value="Antioch">Antioch</option>
+                    <option value="Donelson">Donelson</option>
+                    <option value="Hermitage">Hermitage</option>
+                    <option value="Madison">Madison</option>
+                    <option value="The Gulch">The Gulch</option>
+                    <option value="Downtown">Downtown</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Property Details Section -->
+    <div class="form-card">
+        <div class="form-section-title">Property Details</div>
+        <div class="form-grid">
+            <div class="input-group">
+                <label for="propertyType">Property Type</label>
+                <select id="propertyType">
+                    <option value="Single Family">Single Family</option>
+                    <option value="Townhouse">Townhouse</option>
+                    <option value="Condo">Condo</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label for="sqft">Living Area (sqft)</label>
+                <input type="number" id="sqft" placeholder="e.g. 1850" min="0">
+            </div>
+            <div class="input-group">
+                <label for="lotSizeSqft">Lot Size (sqft)</label>
+                <input type="number" id="lotSizeSqft" placeholder="e.g. 6500" min="0">
+            </div>
+            <div class="input-group">
+                <label for="yearBuilt">Year Built</label>
+                <input type="number" id="yearBuilt" placeholder="e.g. 1945" min="1800" max="2026">
+            </div>
+            <div class="input-group">
+                <label for="bedrooms">Bedrooms</label>
+                <input type="number" id="bedrooms" placeholder="e.g. 3" min="0" max="10">
+            </div>
+            <div class="input-group">
+                <label for="fullBaths">Full Baths</label>
+                <input type="number" id="fullBaths" placeholder="e.g. 2" min="0" max="10">
+            </div>
+            <div class="input-group">
+                <label for="halfBaths">Half Baths</label>
+                <input type="number" id="halfBaths" placeholder="e.g. 1" min="0" max="5">
+            </div>
+            <div class="input-group">
+                <label for="stories">Stories</label>
+                <select id="stories">
+                    <option value="1">1</option>
+                    <option value="1.5">1.5</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Features Section -->
+    <div class="form-card">
+        <div class="form-section-title">Features</div>
+        <div class="form-grid">
+            <div class="input-group">
+                <label for="garageSpaces">Garage Spaces</label>
+                <select id="garageSpaces">
+                    <option value="0">None</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3+</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label for="basement">Basement</label>
+                <select id="basement">
+                    <option value="None">None</option>
+                    <option value="Unfinished">Unfinished</option>
+                    <option value="Partial Finished">Partial Finished</option>
+                    <option value="Full Finished">Full Finished</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label>Pool</label>
+                <div class="toggle-group">
+                    <div class="toggle-option" data-field="hasPool" data-value="false">No</div>
+                    <div class="toggle-option selected" data-field="hasPool" data-value="false">No</div>
+                </div>
+            </div>
+            <div class="input-group">
+                <label for="condition">Condition</label>
+                <select id="condition">
+                    <option value="Excellent">Excellent</option>
+                    <option value="Good" selected>Good</option>
+                    <option value="Average">Average</option>
+                    <option value="Fair">Fair</option>
+                    <option value="Poor">Poor</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Error message -->
+    <div id="formError" class="hidden" style="color:#dc2626;font-size:14px;font-weight:600;margin-bottom:16px;text-align:center;"></div>
+
+    <!-- Submit -->
+    <div class="btn-row" style="justify-content:center;">
+        <button class="btn btn-primary" id="btnAnalyze" style="padding:16px 48px;font-size:16px;">
+            Analyze Comps & Price
+        </button>
+    </div>
+</div>
+
+<!-- ==================== RESULTS VIEW ==================== -->
+<div id="resultsView" class="page-container hidden">
+    <!-- Populated by JS -->
+</div>
+
+<!-- Scripts -->
+<script src="js/mock-data.js"></script>
+<script src="js/pricing-engine.js"></script>
+<script src="js/mls-adapter.js"></script>
+<script>
+(function() {
+    'use strict';
+
+    // ==================== NEIGHBORHOOD COORDINATES ====================
+    // Approximate center of each Nashville neighborhood for distance calc
+    var NEIGHBORHOOD_COORDS = {
+        'East Nashville':       { lat: 36.1783, lng: -86.7450 },
+        'The Nations':          { lat: 36.1655, lng: -86.8460 },
+        'Germantown':           { lat: 36.1820, lng: -86.7890 },
+        'Sylvan Park':          { lat: 36.1555, lng: -86.8335 },
+        'Charlotte Park':       { lat: 36.1620, lng: -86.8510 },
+        'Wedgewood-Houston':    { lat: 36.1425, lng: -86.7775 },
+        '12 South':             { lat: 36.1295, lng: -86.7855 },
+        'Berry Hill':           { lat: 36.1185, lng: -86.7650 },
+        'Melrose':              { lat: 36.1235, lng: -86.7725 },
+        'North Nashville':      { lat: 36.1875, lng: -86.8020 },
+        'Antioch':              { lat: 36.0500, lng: -86.6600 },
+        'Donelson':             { lat: 36.1635, lng: -86.6550 },
+        'Hermitage':            { lat: 36.1905, lng: -86.5920 },
+        'Madison':              { lat: 36.2570, lng: -86.7090 },
+        'The Gulch':            { lat: 36.1515, lng: -86.7870 },
+        'Downtown':             { lat: 36.1625, lng: -86.7795 }
+    };
+
+    // ==================== STATE ====================
+    var adapter = new MLSAdapter('mock');
+    var hasPool = false;
+
+    // ==================== POOL TOGGLE ====================
+    function initPoolToggle() {
+        var container = document.querySelector('.toggle-group');
+        if (!container) return;
+
+        // Replace the duplicate toggle with proper Yes/No
+        container.innerHTML =
+            '<div class="toggle-option" data-value="true">Yes</div>' +
+            '<div class="toggle-option selected" data-value="false">No</div>';
+
+        container.addEventListener('click', function(e) {
+            var option = e.target.closest('.toggle-option');
+            if (!option) return;
+            container.querySelectorAll('.toggle-option').forEach(function(o) {
+                o.classList.remove('selected');
+            });
+            option.classList.add('selected');
+            hasPool = option.dataset.value === 'true';
+        });
+    }
+
+    // ==================== FORM COLLECTION ====================
+    function getSubjectProperty() {
+        var neighborhood = document.getElementById('neighborhood').value;
+        var coords = NEIGHBORHOOD_COORDS[neighborhood] || { lat: 36.1627, lng: -86.7816 }; // Nashville center default
+
+        return {
+            address: document.getElementById('address').value.trim(),
+            city: 'Nashville',
+            zip: document.getElementById('zip').value.trim(),
+            neighborhood: neighborhood,
+            propertyType: document.getElementById('propertyType').value,
+            sqft: parseInt(document.getElementById('sqft').value) || 0,
+            lotSizeSqft: parseInt(document.getElementById('lotSizeSqft').value) || 0,
+            yearBuilt: parseInt(document.getElementById('yearBuilt').value) || 0,
+            bedrooms: parseInt(document.getElementById('bedrooms').value) || 0,
+            fullBaths: parseInt(document.getElementById('fullBaths').value) || 0,
+            halfBaths: parseInt(document.getElementById('halfBaths').value) || 0,
+            stories: parseFloat(document.getElementById('stories').value) || 1,
+            garageSpaces: parseInt(document.getElementById('garageSpaces').value) || 0,
+            hasPool: hasPool,
+            basement: document.getElementById('basement').value,
+            condition: document.getElementById('condition').value,
+            latitude: coords.lat,
+            longitude: coords.lng
+        };
+    }
+
+    function validateForm(subject) {
+        if (!subject.sqft || subject.sqft < 200) return 'Please enter the living area square footage.';
+        if (!subject.yearBuilt || subject.yearBuilt < 1800) return 'Please enter the year built.';
+        if (!subject.bedrooms) return 'Please enter the number of bedrooms.';
+        if (!subject.fullBaths) return 'Please enter the number of full bathrooms.';
+        return null;
+    }
+
+    // ==================== ANALYSIS ====================
+    function runAnalysis() {
+        var subject = getSubjectProperty();
+        var error = validateForm(subject);
+        var errorEl = document.getElementById('formError');
+
+        if (error) {
+            errorEl.textContent = error;
+            errorEl.classList.remove('hidden');
+            return;
+        }
+        errorEl.classList.add('hidden');
+
+        // Show loading state
+        var btn = document.getElementById('btnAnalyze');
+        btn.textContent = 'Analyzing...';
+        btn.disabled = true;
+
+        // Run comp search (async for future API compatibility)
+        Promise.all([
+            adapter.searchComps(subject, 'closed'),
+            adapter.searchComps(subject, 'active')
+        ]).then(function(results) {
+            var closedPool = results[0];
+            var activePool = results[1];
+
+            // Find best comps using pricing engine
+            var closedComps = PricingEngine.findBestComps(subject, closedPool, 'closed');
+            var activeComps = PricingEngine.findBestComps(subject, activePool, 'active');
+
+            // Estimate price from closed comps
+            var estimate = PricingEngine.estimatePrice(subject, closedComps);
+
+            // Render results
+            renderResults(subject, closedComps, activeComps, estimate);
+
+            // Show results view
+            document.getElementById('inputView').classList.add('hidden');
+            document.getElementById('resultsView').classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'instant' });
+
+        }).finally(function() {
+            btn.textContent = 'Analyze Comps & Price';
+            btn.disabled = false;
+        });
+    }
+
+    // ==================== RESULTS RENDERING ====================
+    function renderResults(subject, closedComps, activeComps, estimate) {
+        var container = document.getElementById('resultsView');
+        var html = '';
+
+        // Subject property header
+        html += '<div class="fade-in">';
+        html += '<div style="margin-bottom:24px;">';
+        html += '<button class="btn btn-secondary" id="btnBack" style="margin-bottom:16px;">&larr; Back to Input</button>';
+        html += '<h1 class="page-title">' + esc(subject.address || 'Subject Property') + '</h1>';
+        html += '<p class="page-subtitle">' + esc(subject.neighborhood || '') + ' &bull; ';
+        html += subject.bedrooms + ' bed / ' + subject.fullBaths + ' bath';
+        if (subject.halfBaths) html += ' / ' + subject.halfBaths + ' half';
+        html += ' &bull; ' + subject.sqft.toLocaleString() + ' sqft';
+        html += ' &bull; Built ' + subject.yearBuilt;
+        html += '</p></div>';
+
+        // Price banner
+        html += renderPriceBanner(estimate);
+
+        // Market snapshot
+        html += renderMarketStrip(estimate.marketIndicators);
+
+        // Methodology cross-check
+        html += renderMethodology(estimate);
+
+        // Closed comps table
+        html += renderCompSection('Top Closed Comps', closedComps, 'closed');
+
+        // Active comps table
+        html += renderCompSection('Active Listings for Reference', activeComps, 'active');
+
+        // Footer
+        html += '<div style="text-align:center;margin:32px 0;font-size:12px;color:#999;line-height:1.6;">';
+        html += 'Pricing based on CMA methodology with Nashville-calibrated adjustments.<br>';
+        html += 'Currently using demo data. Connect to Realtracs MLS for live comp analysis.';
+        html += '</div>';
+
+        html += '</div>';
+        container.innerHTML = html;
+
+        // Wire back button
+        document.getElementById('btnBack').addEventListener('click', function() {
+            document.getElementById('resultsView').classList.add('hidden');
+            document.getElementById('inputView').classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'instant' });
+        });
+
+        // Wire comp row expansion
+        wireCompExpansion();
+    }
+
+    function renderPriceBanner(estimate) {
+        var conf = estimate.confidence;
+        var confClass = conf === 'High' ? 'confidence-high' : conf === 'Medium' ? 'confidence-medium' : 'confidence-low';
+
+        var html = '<div class="price-banner">';
+        html += '<div class="price-banner-label">Estimated Market Value</div>';
+        html += '<div class="price-range-display">';
+        html += '<span class="price-low">' + PricingEngine.formatMoney(estimate.range.low) + '</span>';
+        html += '<span class="price-suggested">' + PricingEngine.formatMoney(estimate.range.suggested) + '</span>';
+        html += '<span class="price-high">' + PricingEngine.formatMoney(estimate.range.high) + '</span>';
+        html += '</div>';
+        html += '<div class="price-range-labels">';
+        html += '<span>Low</span><span>Suggested</span><span>High</span>';
+        html += '</div>';
+        html += '<span class="confidence-badge ' + confClass + '">' + conf + ' Confidence</span>';
+        html += ' <span style="font-size:12px;color:#999;margin-left:8px;">Based on ' + estimate.compsUsed + ' closed comp' + (estimate.compsUsed !== 1 ? 's' : '') + '</span>';
+        html += '</div>';
+        return html;
+    }
+
+    function renderMarketStrip(indicators) {
+        var html = '<div class="market-strip">';
+        html += '<div class="market-stat"><div class="market-stat-value">' + indicators.avgDOM + ' days</div><div class="market-stat-label">Avg Days on Market</div></div>';
+        html += '<div class="market-stat"><div class="market-stat-value">' + (indicators.listToSaleRatio * 100).toFixed(1) + '%</div><div class="market-stat-label">List-to-Sale Ratio</div></div>';
+        html += '<div class="market-stat"><div class="market-stat-value">' + indicators.absorptionRateMonths + ' mo</div><div class="market-stat-label">Months of Supply</div></div>';
+        html += '<div class="market-stat"><div class="market-stat-value">' + (indicators.annualAppreciation * 100).toFixed(1) + '%</div><div class="market-stat-label">Annual Appreciation</div></div>';
+        html += '</div>';
+        return html;
+    }
+
+    function renderMethodology(estimate) {
+        var m = estimate.methodology;
+        var html = '<div class="methodology-card">';
+        html += '<h3>Price Cross-Check</h3>';
+        html += '<div class="methodology-row"><span class="label">Weighted Avg (primary)</span><span class="value">' + PricingEngine.formatMoney(m.weightedAverage) + '</span></div>';
+        html += '<div class="methodology-row"><span class="label">Median</span><span class="value">' + PricingEngine.formatMoney(m.median) + '</span></div>';
+        html += '<div class="methodology-row"><span class="label">Price/Sqft Method</span><span class="value">' + PricingEngine.formatMoney(m.sqftEstimate) + ' ($' + m.pricePerSqft + '/sqft)</span></div>';
+        html += '<div class="methodology-row"><span class="label">Avg Adjustment</span><span class="value">' + m.avgAdjustmentPct + '%</span></div>';
+        html += '<div class="methodology-row"><span class="label">Price Spread</span><span class="value">' + m.priceSpreadPct + '%</span></div>';
+        html += '</div>';
+        return html;
+    }
+
+    function renderCompSection(title, comps, type) {
+        var html = '<div class="comp-section">';
+        html += '<div class="comp-section-header">';
+        html += '<span class="comp-section-title">' + title + '</span>';
+        html += '<span class="comp-count">' + comps.length + ' comp' + (comps.length !== 1 ? 's' : '') + '</span>';
+        html += '</div>';
+
+        if (comps.length === 0) {
+            html += '<div style="padding:24px;text-align:center;color:#999;font-size:14px;">No comparable properties found. Try widening your search criteria.</div>';
+            html += '</div>';
+            return html;
+        }
+
+        html += '<div class="comp-table-wrapper">';
+        html += '<table class="comp-table">';
+        html += '<thead><tr>';
+        html += '<th>#</th>';
+        html += '<th>Address</th>';
+        html += '<th class="right">' + (type === 'closed' ? 'Sold Price' : 'List Price') + '</th>';
+        if (type === 'closed') {
+            html += '<th class="right">Adj. Price</th>';
+            html += '<th class="right">Net Adj.</th>';
+        }
+        html += '<th class="right">$/Sqft</th>';
+        html += '<th class="right">Dist.</th>';
+        if (type === 'closed') {
+            html += '<th class="right">Days Ago</th>';
+        } else {
+            html += '<th class="right">DOM</th>';
+        }
+        html += '<th>Score</th>';
+        html += '</tr></thead>';
+        html += '<tbody>';
+
+        for (var i = 0; i < comps.length; i++) {
+            var c = comps[i];
+            var price = type === 'closed' ? c.soldPrice : c.listPrice;
+            var psf = c.sqft ? Math.round(price / c.sqft) : 0;
+            var scoreLevel = c.similarityScore >= 70 ? 'high' : c.similarityScore >= 45 ? 'medium' : 'low';
+
+            html += '<tr class="comp-row" data-index="' + i + '" data-type="' + type + '">';
+            html += '<td><span class="rank-badge">' + (i + 1) + '</span></td>';
+            html += '<td>';
+            html += '<div style="font-weight:600;">' + esc(c.address) + '</div>';
+            html += '<div style="font-size:12px;color:#999;">' + c.bedrooms + 'bd/' + c.fullBaths + 'ba';
+            if (c.halfBaths) html += '/' + c.halfBaths + 'hba';
+            html += ' &bull; ' + (c.sqft || 0).toLocaleString() + 'sf &bull; ' + (c.yearBuilt || '') + '</div>';
+            html += '</td>';
+            html += '<td class="right" style="font-weight:600;">' + PricingEngine.formatMoney(price) + '</td>';
+
+            if (type === 'closed') {
+                html += '<td class="right" style="font-weight:600;">' + PricingEngine.formatMoney(c.adjustedPrice) + '</td>';
+                var adjClass = c.totalAdjustment > 0 ? 'adj-positive' : c.totalAdjustment < 0 ? 'adj-negative' : 'adj-neutral';
+                html += '<td class="right"><span class="' + adjClass + '">' + PricingEngine.formatAdjustment(c.totalAdjustment) + '</span>';
+                html += ' <span class="reliability-flag ' + (c.isReliable ? 'reliable' : 'unreliable') + '">' + c.adjustmentPct + '%</span></td>';
+            }
+
+            html += '<td class="right">$' + psf + '</td>';
+            html += '<td class="right">' + c.distance + ' mi</td>';
+
+            if (type === 'closed') {
+                html += '<td class="right">' + c.daysSinceSale + 'd</td>';
+            } else {
+                html += '<td class="right">' + (c.daysOnMarket || '—') + '</td>';
+            }
+
+            html += '<td>';
+            html += '<div class="score-bar-container">';
+            html += '<div class="score-bar"><div class="score-bar-fill ' + scoreLevel + '" style="width:' + c.similarityScore + '%"></div></div>';
+            html += '<span class="score-value">' + c.similarityScore + '</span>';
+            html += '</div>';
+            html += '</td>';
+            html += '</tr>';
+
+            // Detail expansion row (hidden by default)
+            html += '<tr class="comp-detail-row" data-detail-index="' + i + '" data-detail-type="' + type + '">';
+            html += '<td colspan="' + (type === 'closed' ? 9 : 7) + '">';
+            html += renderCompDetail(c, type);
+            html += '</td>';
+            html += '</tr>';
+        }
+
+        html += '</tbody></table></div></div>';
+        return html;
+    }
+
+    function renderCompDetail(comp, type) {
+        var html = '<div class="comp-detail-inner">';
+        html += '<div style="font-weight:700;font-size:14px;margin-bottom:12px;">Adjustment Breakdown</div>';
+        html += '<div class="adjustment-grid">';
+
+        var adj = comp.adjustments || {};
+        var labels = {
+            time: 'Time/Market',
+            sqft: 'Square Footage',
+            bedrooms: 'Bedrooms',
+            bathrooms: 'Bathrooms',
+            age: 'Age/Year Built',
+            condition: 'Condition',
+            garage: 'Garage',
+            pool: 'Pool',
+            lot: 'Lot Size',
+            basement: 'Basement'
+        };
+
+        var keys = Object.keys(labels);
+        for (var i = 0; i < keys.length; i++) {
+            var key = keys[i];
+            var val = adj[key] || 0;
+            var adjClass = val > 0 ? 'adj-positive' : val < 0 ? 'adj-negative' : 'adj-neutral';
+            html += '<div class="adjustment-item">';
+            html += '<span class="adj-label">' + labels[key] + '</span>';
+            html += '<span class="adj-value ' + adjClass + '">' + PricingEngine.formatAdjustment(val) + '</span>';
+            html += '</div>';
+        }
+
+        html += '</div>';
+
+        // Total
+        html += '<div class="adjustment-total">';
+        html += '<span>Net Adjustment</span>';
+        var totalClass = comp.totalAdjustment > 0 ? 'adj-positive' : comp.totalAdjustment < 0 ? 'adj-negative' : 'adj-neutral';
+        html += '<span class="' + totalClass + '">' + PricingEngine.formatAdjustment(comp.totalAdjustment) + ' (' + comp.adjustmentPct + '%)</span>';
+        html += '</div>';
+
+        // Score breakdown
+        if (comp.scoreBreakdown) {
+            html += '<div style="margin-top:16px;padding-top:12px;border-top:1px solid #eee;">';
+            html += '<div style="font-weight:700;font-size:13px;margin-bottom:8px;">Similarity Score Breakdown</div>';
+            html += '<div class="adjustment-grid">';
+            var scoreLabels = {
+                proximity: 'Proximity',
+                recency: 'Recency',
+                sqftSimilarity: 'Size Match',
+                adjustmentMagnitude: 'Adj. Magnitude',
+                featureMatch: 'Feature Match',
+                sameSubdivision: 'Same Area'
+            };
+            var skeys = Object.keys(scoreLabels);
+            for (var j = 0; j < skeys.length; j++) {
+                var sk = skeys[j];
+                var sv = comp.scoreBreakdown[sk] || 0;
+                html += '<div class="adjustment-item">';
+                html += '<span class="adj-label">' + scoreLabels[sk] + '</span>';
+                html += '<span class="adj-value">' + Math.round(sv) + '/100</span>';
+                html += '</div>';
+            }
+            html += '</div></div>';
+        }
+
+        html += '</div>';
+        return html;
+    }
+
+    // ==================== COMP ROW EXPANSION ====================
+    function wireCompExpansion() {
+        document.querySelectorAll('.comp-row').forEach(function(row) {
+            row.addEventListener('click', function() {
+                var idx = row.dataset.index;
+                var type = row.dataset.type;
+                var detail = document.querySelector('[data-detail-index="' + idx + '"][data-detail-type="' + type + '"]');
+                if (detail) {
+                    detail.classList.toggle('expanded');
+                }
+            });
+        });
+    }
+
+    // ==================== HELPERS ====================
+    function esc(str) {
+        if (!str) return '';
+        var div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
+    }
+
+    // ==================== INIT ====================
+    initPoolToggle();
+
+    document.getElementById('btnAnalyze').addEventListener('click', runAnalysis);
+
+    // Enter key on last visible input triggers analysis
+    document.querySelectorAll('#inputView input').forEach(function(input) {
+        input.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                document.getElementById('btnAnalyze').click();
+            }
+        });
+    });
+
+})();
+</script>
+
+</body>
+</html>

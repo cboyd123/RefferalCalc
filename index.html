@@ -381,6 +381,27 @@
             .option-cards { flex-direction: column; }
         }
 
+        /* Nav link to pricing tool */
+        .pricing-tool-link {
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            z-index: 1000;
+            padding: 10px 20px;
+            font-size: 13px;
+            font-weight: 700;
+            color: #1a1a1a;
+            background: var(--accent);
+            border-radius: 8px;
+            text-decoration: none;
+            transition: all 0.2s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+        .pricing-tool-link:hover {
+            background: var(--accent-hover);
+            transform: translateY(-1px);
+        }
+
         /* ==================== HERO LANDING PAGE ==================== */
         body.hero-active {
             display: block;
@@ -601,6 +622,8 @@
     </style>
 </head>
 <body>
+
+<a href="pricing.html" class="pricing-tool-link">Home Pricing Tool &rarr;</a>
 
 <div class="calculator" id="calculator">
     <div class="progress-bar">
