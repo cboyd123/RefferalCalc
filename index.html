@@ -380,6 +380,224 @@
             .result-value { font-size: 26px; }
             .option-cards { flex-direction: column; }
         }
+
+        /* ==================== HERO LANDING PAGE ==================== */
+        body.hero-active {
+            display: block;
+            padding: 0;
+            align-items: stretch;
+            justify-content: flex-start;
+        }
+        body.hero-active .calculator {
+            display: none;
+        }
+
+        .hero-landing {
+            width: 100%;
+        }
+
+        /* Hero above the fold */
+        .hero-section {
+            min-height: 100vh;
+            min-height: 100svh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 60px 24px;
+            background: linear-gradient(180deg, #ffffff 0%, #fffef5 100%);
+        }
+
+        .hero-headline {
+            font-size: 52px;
+            font-weight: 800;
+            line-height: 1.1;
+            color: var(--primary);
+            max-width: 720px;
+            margin-bottom: 20px;
+            letter-spacing: -1px;
+        }
+
+        .highlight-word {
+            position: relative;
+            display: inline;
+        }
+        .highlight-word::after {
+            content: '';
+            position: absolute;
+            bottom: 2px;
+            left: 0;
+            right: 0;
+            height: 10px;
+            background: rgba(245, 197, 24, 0.35);
+            z-index: -1;
+            border-radius: 2px;
+        }
+
+        .hero-subheadline {
+            font-size: 19px;
+            color: var(--text-muted);
+            max-width: 600px;
+            line-height: 1.6;
+            margin-bottom: 32px;
+        }
+
+        .hero-badges {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 36px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .hero-badge {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+            background: #fff;
+            border: 1px solid var(--border);
+            padding: 8px 18px;
+            border-radius: 100px;
+            letter-spacing: 0.3px;
+        }
+
+        .hero-cta {
+            padding: 18px 48px;
+            font-size: 17px;
+            font-weight: 700;
+            background: var(--accent);
+            color: #1a1a1a;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .hero-cta:hover {
+            background: var(--accent-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(245, 197, 24, 0.35);
+        }
+
+        /* Stats strip */
+        .stats-strip {
+            background: #fef9e7;
+            padding: 48px 24px;
+            display: flex;
+            justify-content: center;
+            gap: 64px;
+            flex-wrap: wrap;
+        }
+        .stat-block { text-align: center; }
+        .stat-number {
+            font-size: 42px;
+            font-weight: 800;
+            color: var(--primary);
+        }
+        .stat-label {
+            font-size: 14px;
+            color: var(--text-muted);
+            max-width: 220px;
+            line-height: 1.4;
+            margin-top: 4px;
+        }
+
+        /* What you'll discover */
+        .learn-section {
+            padding: 64px 24px;
+            text-align: center;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .learn-section h2 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 40px;
+            color: var(--primary);
+        }
+        .learn-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+        }
+        .learn-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 28px 20px;
+            text-align: left;
+        }
+        .learn-card-icon {
+            width: 44px;
+            height: 44px;
+            background: #fef3cd;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            margin-bottom: 14px;
+            font-weight: 700;
+            color: #b45309;
+        }
+        .learn-card h3 {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 6px;
+            color: var(--primary);
+        }
+        .learn-card p {
+            font-size: 14px;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        /* Hero form section */
+        .hero-form-section {
+            padding: 16px 24px 64px;
+            display: flex;
+            justify-content: center;
+        }
+        .hero-form-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            padding: 40px 36px;
+            max-width: 480px;
+            width: 100%;
+            text-align: center;
+        }
+        .hero-form-card h2 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--primary);
+        }
+        .hero-form-card .form-subtext {
+            font-size: 15px;
+            color: var(--text-muted);
+            margin-bottom: 28px;
+            line-height: 1.5;
+        }
+        .hero-privacy {
+            font-size: 12px;
+            color: #999;
+            margin-top: 12px;
+        }
+
+        /* Hero responsive */
+        @media (max-width: 768px) {
+            .hero-headline { font-size: 36px; }
+            .hero-subheadline { font-size: 16px; }
+            .learn-grid { grid-template-columns: 1fr; }
+            .stats-strip { gap: 32px; flex-direction: column; align-items: center; }
+            .stat-number { font-size: 32px; }
+        }
+        @media (max-width: 480px) {
+            .hero-headline { font-size: 30px; }
+            .hero-section { padding: 40px 18px; min-height: auto; padding-top: 80px; padding-bottom: 60px; }
+            .hero-form-card { padding: 28px 22px; }
+            .hero-cta { padding: 16px 36px; font-size: 15px; }
+        }
     </style>
 </head>
 <body>
@@ -652,11 +870,154 @@
 
     const TOTAL_INPUT_STEPS = 7; // intro + 6 questions (results not counted)
 
+    // ==================== HERO LANDING PAGE ====================
+    function renderHeroPage() {
+        return `
+            <div class="hero-section">
+                <h1 class="hero-headline">
+                    Your next 10 deals are already <span class="highlight-word">in your phone</span>.
+                </h1>
+                <p class="hero-subheadline">
+                    Discover exactly how much revenue your sphere of influence and past
+                    clients should be generating &mdash; and the gap between that and reality.
+                </p>
+                <div class="hero-badges">
+                    <span class="hero-badge">Based on NAR Data</span>
+                    <span class="hero-badge">Takes 60 Seconds</span>
+                    <span class="hero-badge">100% Free</span>
+                </div>
+                <button class="hero-cta" id="heroScrollCta">Calculate My Earnings Gap</button>
+            </div>
+
+            <div class="stats-strip">
+                <div class="stat-block">
+                    <div class="stat-number">82%</div>
+                    <div class="stat-label">of home sales come from referrals and repeat business</div>
+                </div>
+                <div class="stat-block">
+                    <div class="stat-number">4x</div>
+                    <div class="stat-label">higher conversion from a nurtured sphere vs. a neglected one</div>
+                </div>
+                <div class="stat-block">
+                    <div class="stat-number">12%</div>
+                    <div class="stat-label">annual repeat rate from past clients with consistent follow-up</div>
+                </div>
+            </div>
+
+            <div class="learn-section">
+                <h2>In 60 seconds, you'll discover:</h2>
+                <div class="learn-grid">
+                    <div class="learn-card">
+                        <div class="learn-card-icon">$</div>
+                        <h3>Your network's true value</h3>
+                        <p>The dollar amount your sphere and past clients could realistically generate this year.</p>
+                    </div>
+                    <div class="learn-card">
+                        <div class="learn-card-icon">#</div>
+                        <h3>Deals hiding in your phone</h3>
+                        <p>How many transactions are sitting untapped in your existing contacts right now.</p>
+                    </div>
+                    <div class="learn-card">
+                        <div class="learn-card-icon">%</div>
+                        <h3>Your revenue gap</h3>
+                        <p>The exact difference between what you earned and what you could be earning.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hero-form-section" id="heroFormSection">
+                <div class="hero-form-card">
+                    <h2>Ready to see your number?</h2>
+                    <p class="form-subtext">
+                        Enter your info below. We'll calculate your personalized earnings
+                        report using real industry benchmarks.
+                    </p>
+                    <div class="input-group" style="text-align:left;">
+                        <label>First name</label>
+                        <input type="text" id="firstName" placeholder="Your first name"
+                               value="${esc(state.data.firstName)}">
+                    </div>
+                    <div class="input-group" style="text-align:left;">
+                        <label>Email</label>
+                        <input type="email" id="email" placeholder="you@email.com"
+                               value="${esc(state.data.email)}">
+                    </div>
+                    <div class="btn-row">
+                        <button class="btn btn-primary" id="btnNext" style="width:100%;">Show Me What I'm Missing</button>
+                    </div>
+                    <p class="hero-privacy">No spam, ever. Just your personalized results.</p>
+                </div>
+            </div>
+        `;
+    }
+
+    function wireHeroEvents(hero, step) {
+        // Scroll CTA
+        const scrollBtn = hero.querySelector('#heroScrollCta');
+        if (scrollBtn) {
+            scrollBtn.addEventListener('click', () => {
+                document.getElementById('heroFormSection').scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
+                setTimeout(() => {
+                    const nameInput = document.getElementById('firstName');
+                    if (nameInput) nameInput.focus();
+                }, 600);
+            });
+        }
+
+        // Form submit
+        const btnNext = hero.querySelector('#btnNext');
+        if (btnNext) {
+            btnNext.addEventListener('click', () => {
+                const result = step.validate();
+                if (result !== true) {
+                    showError(result);
+                    return;
+                }
+                clearError();
+                state.currentStep++;
+                window.scrollTo({ top: 0, behavior: 'instant' });
+                renderStep();
+            });
+        }
+
+        // Enter key on inputs
+        hero.querySelectorAll('input').forEach(input => {
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && btnNext) btnNext.click();
+            });
+        });
+    }
+
     // ==================== RENDER ====================
     function renderStep() {
+        const calculator = document.getElementById('calculator');
         const container = document.getElementById('stepContainer');
         const progress = document.getElementById('progressFill');
         const step = steps[state.currentStep];
+
+        // === HERO MODE for Step 0 ===
+        if (state.currentStep === 0) {
+            document.body.classList.add('hero-active');
+
+            let hero = document.getElementById('heroLanding');
+            if (!hero) {
+                hero = document.createElement('div');
+                hero.id = 'heroLanding';
+                hero.className = 'hero-landing';
+                document.body.insertBefore(hero, calculator);
+            }
+            hero.innerHTML = renderHeroPage();
+            wireHeroEvents(hero, step);
+            return;
+        }
+
+        // === NORMAL CARD MODE for Steps 1+ ===
+        document.body.classList.remove('hero-active');
+        const hero = document.getElementById('heroLanding');
+        if (hero) hero.remove();
 
         container.innerHTML = step.render();
         progress.style.width = `${(state.currentStep / TOTAL_INPUT_STEPS) * 100}%`;
@@ -910,6 +1271,7 @@
                 transactionsLastYear: '',
                 hasFollowUp: null
             };
+            window.scrollTo({ top: 0, behavior: 'instant' });
             renderStep();
         }
     });
