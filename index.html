@@ -400,6 +400,12 @@
     // Update this URL to your actual booking page
     const BOOKING_URL = 'https://5dwhdnnocmn.typeform.com/to/TEzPcxMI';
 
+    // ==================== AIRTABLE CONFIG ====================
+    // Replace these with your actual Airtable credentials
+    const AIRTABLE_TOKEN = 'YOUR_AIRTABLE_PAT_HERE';       // e.g. patXXXXXXXXXXXXXX
+    const AIRTABLE_BASE_ID = 'YOUR_BASE_ID_HERE';          // e.g. appXXXXXXXXXXXXXX
+    const AIRTABLE_TABLE_NAME = 'YOUR_TABLE_NAME_HERE';    // e.g. 'Calculator Leads'
+
     // Industry benchmarks (NAR + real estate coaching data)
     const BENCHMARKS = {
         // A well-nurtured sphere converts at ~2 transactions per 50 contacts/year
@@ -821,6 +827,53 @@
         `;
     }
 
+    // ==================== AIRTABLE SUBMISSION ====================
+    function sendToAirtable() {
+        const d = state.data;
+        const sphere = Number(d.sphereSize);
+        const pastClients = Number(d.pastClients);
+        const actualDeals = Number(d.transactionsLastYear);
+        const homePrice = Number(d.avgHomePrice);
+        const commission = Number(d.commissionPct) / 100;
+        const gciPerDeal = homePrice * commission;
+        const currentIncome = actualDeals * gciPerDeal;
+        const potentialSphereDeals = sphere * BENCHMARKS.sphereNurturedRate;
+        const potentialPCDeals = pastClients * BENCHMARKS.pastClientNurturedRate;
+        const potentialTotalDeals = potentialSphereDeals + potentialPCDeals;
+        const potentialIncome = potentialTotalDeals * gciPerDeal;
+        const gap = potentialIncome - currentIncome;
+
+        const url = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${encodeURIComponent(AIRTABLE_TABLE_NAME)}`;
+
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Authorization': 'Bearer ' + AIRTABLE_TOKEN,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                fields: {
+                    'First Name': d.firstName,
+                    'Email': d.email,
+                    'Sphere Size': sphere,
+                    'Past Clients': pastClients,
+                    'Transactions Last Year': actualDeals,
+                    'Avg Home Price': homePrice,
+                    'Commission %': Number(d.commissionPct),
+                    'Has Follow-Up System': d.hasFollowUp ? 'Yes' : 'No',
+                    'GCI Per Deal': Math.round(gciPerDeal),
+                    'Current GCI': Math.round(currentIncome),
+                    'Potential GCI': Math.round(potentialIncome),
+                    'Gap Amount': Math.round(gap),
+                    'Potential Deals': Math.round(potentialTotalDeals * 10) / 10,
+                    'Submitted At': new Date().toISOString()
+                }
+            })
+        }).catch(function() {
+            // Silently fail — don't block the user from booking
+        });
+    }
+
     // ==================== HELPERS ====================
     function formatMoney(n) {
         return '$' + Math.round(n).toLocaleString('en-US');
@@ -835,6 +888,13 @@
 
     // ==================== INIT ====================
     renderStep();
+
+    // Send to Airtable when CTA is clicked, then let the link navigate
+    document.addEventListener('click', (e) => {
+        if (e.target && e.target.id === 'btnBookCall') {
+            sendToAirtable();
+        }
+    });
 
     // Delegate restart button (rendered inside results)
     document.addEventListener('click', (e) => {
