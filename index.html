@@ -612,6 +612,108 @@
         .ic-legend-dot.avg { background: #d1d5db; }
         .ic-legend-dot.top { background: #a78bfa; }
 
+        /* 5-Year projection timeline */
+        .projection-timeline {
+            margin: 20px 0 8px;
+            padding: 24px 20px;
+            border-radius: 14px;
+            border: 1px solid var(--border);
+            background: var(--card-bg);
+        }
+        .projection-timeline .pt-title {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+            text-align: center;
+        }
+        .projection-timeline .pt-subtitle {
+            font-size: 13px;
+            color: #888;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .pt-chart {
+            display: flex;
+            align-items: flex-end;
+            gap: 8px;
+            height: 180px;
+            padding: 0 4px;
+            margin-bottom: 10px;
+        }
+        .pt-col {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100%;
+            justify-content: flex-end;
+        }
+        .pt-col-value {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+            white-space: nowrap;
+        }
+        .pt-col-bar {
+            width: 100%;
+            max-width: 56px;
+            border-radius: 8px 8px 0 0;
+            position: relative;
+            transition: height 0.5s ease;
+        }
+        .pt-col-bar.current { background: #e5e7eb; }
+        .pt-col-bar.future { background: var(--primary); }
+        .pt-col-bar.future.yr1 { opacity: 0.4; }
+        .pt-col-bar.future.yr2 { opacity: 0.55; }
+        .pt-col-bar.future.yr3 { opacity: 0.7; }
+        .pt-col-bar.future.yr4 { opacity: 0.85; }
+        .pt-col-bar.future.yr5 { opacity: 1.0; }
+        .pt-col-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: #888;
+            margin-top: 6px;
+        }
+        .pt-col-label.highlight {
+            color: var(--primary);
+            font-weight: 700;
+        }
+        .pt-col-deals {
+            font-size: 10px;
+            color: #aaa;
+            margin-top: 2px;
+        }
+        .pt-milestones {
+            margin-top: 18px;
+            border-top: 1px solid var(--border);
+            padding-top: 14px;
+        }
+        .pt-milestone {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .pt-milestone:last-child { margin-bottom: 0; }
+        .pt-ms-when {
+            flex-shrink: 0;
+            width: 72px;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--primary);
+            padding-top: 1px;
+        }
+        .pt-ms-what {
+            font-size: 12.5px;
+            color: #555;
+            line-height: 1.45;
+        }
+        .pt-ms-what strong { color: var(--text-primary); }
+
         /* Source footnote */
         .data-source {
             font-size: 11px;
@@ -1774,6 +1876,106 @@
                             <span class="ic-label">Top 25%</span>
                             <div class="ic-bar-track"><div class="ic-bar-fill top" style="width:${pctBar(narTopSphere, maxSphere)}%"></div></div>
                             <span class="ic-val">${narTopSphere}</span>
+                        </div>
+                    </div>`;
+                })()}
+
+                ${(() => {
+                    // Realistic nurture ramp: relationships take time
+                    // Based on NAR data on referral maturation cycles
+                    // Month 1-6: building trust, minimal deal flow
+                    // Month 7-12: first referrals start, modest lift
+                    // Year 2: relationships deepen, stronger conversion
+                    // Year 3+: compounding — happy clients refer more, sphere grows
+
+                    const currentRate = rates.sphereRate;
+                    const currentPCRate = rates.pastClientRate;
+                    const targetSphereRate = BENCHMARKS.sphereNurturedRate;
+                    const targetPCRate = BENCHMARKS.pastClientNurturedRate;
+
+                    // Sphere grows ~8% per year when nurtured (new intros, referrals bringing people in)
+                    const sphereGrowthRate = 0.08;
+                    // Past client base grows by deals closed each year
+                    const isNurturing = d.sphereFrequency === 'monthly';
+                    const isPCNurturing = d.pastClientFrequency === 'monthly';
+
+                    // Ramp percentages toward target rate (realistic S-curve)
+                    // Year 1: only 25% of the way (trust building)
+                    // Year 2: 55% (relationships maturing, first big referral wave)
+                    // Year 3: 80% (established as go-to agent)
+                    // Year 4: 92% (near full potential)
+                    // Year 5: 100% (fully nurtured network)
+                    const rampPct = [0.25, 0.55, 0.80, 0.92, 1.0];
+
+                    const years = [];
+                    for (let y = 0; y < 5; y++) {
+                        const ramp = rampPct[y];
+                        const ySphere = Math.round(sphere * Math.pow(1 + sphereGrowthRate, y + 1));
+                        const sphereRate = isNurturing ? targetSphereRate : currentRate + (targetSphereRate - currentRate) * ramp;
+                        const pcRate = isPCNurturing ? targetPCRate : currentPCRate + (targetPCRate - currentPCRate) * ramp;
+                        const yPC = pastClients + Math.round(actualDeals * (y + 1) * 0.7); // accumulate past clients
+                        const deals = Math.round(ySphere * sphereRate + yPC * pcRate);
+                        const gci = deals * gciPerDeal;
+                        years.push({ year: y + 1, sphere: ySphere, pc: yPC, deals, gci, sphereRate, pcRate });
+                    }
+
+                    const allGCI = [currentIncome, ...years.map(y => y.gci)];
+                    const maxGCI = Math.max(...allGCI);
+                    const barPct = (v) => Math.max(Math.round((v / maxGCI) * 100), 4);
+
+                    const yrClasses = ['yr1', 'yr2', 'yr3', 'yr4', 'yr5'];
+
+                    // Find first year where deals exceed current
+                    const firstDealLift = years.findIndex(y => y.deals > actualDeals);
+                    // Find first year where GCI roughly doubles
+                    const firstDouble = years.findIndex(y => y.gci >= currentIncome * 2);
+
+                    return `
+                    <div class="projection-timeline">
+                        <div class="pt-title">If you started nurturing today</div>
+                        <div class="pt-subtitle">Realistic timeline based on relationship maturation cycles</div>
+
+                        <div class="pt-chart">
+                            <div class="pt-col">
+                                <div class="pt-col-value">${formatMoney(currentIncome)}</div>
+                                <div class="pt-col-bar current" style="height:${barPct(currentIncome)}%"></div>
+                                <div class="pt-col-label">Today</div>
+                                <div class="pt-col-deals">${actualDeals} deals</div>
+                            </div>
+                            ${years.map((y, i) => `
+                            <div class="pt-col">
+                                <div class="pt-col-value">${formatMoney(y.gci)}</div>
+                                <div class="pt-col-bar future ${yrClasses[i]}" style="height:${barPct(y.gci)}%"></div>
+                                <div class="pt-col-label ${i === 4 ? 'highlight' : ''}">Year ${y.year}</div>
+                                <div class="pt-col-deals">${y.deals} deals</div>
+                            </div>`).join('')}
+                        </div>
+
+                        <div class="pt-milestones">
+                            <div class="pt-milestone">
+                                <div class="pt-ms-when">Months 1–6</div>
+                                <div class="pt-ms-what">
+                                    <strong>Building trust.</strong> You're reaching out consistently but most people aren't ready to transact yet. Expect ${Math.round(years[0].deals * 0.3)}–${Math.round(years[0].deals * 0.5)} extra touches to convert by year-end.
+                                </div>
+                            </div>
+                            <div class="pt-milestone">
+                                <div class="pt-ms-when">Months 7–12</div>
+                                <div class="pt-ms-what">
+                                    <strong>First referrals land.</strong> People start thinking of you first. Your sphere conversion could reach ${(years[0].sphereRate * 100).toFixed(1)}%, up from ${(currentRate * 100).toFixed(1)}% today.
+                                </div>
+                            </div>
+                            <div class="pt-milestone">
+                                <div class="pt-ms-when">Year 2</div>
+                                <div class="pt-ms-what">
+                                    <strong>The referral flywheel kicks in.</strong> Happy clients from Year 1 refer friends. Your network grows to ~${years[1].sphere.toLocaleString()} and you could close <strong>${years[1].deals} deals</strong> (${formatMoney(years[1].gci)} GCI).
+                                </div>
+                            </div>
+                            <div class="pt-milestone">
+                                <div class="pt-ms-when">Year 3–5</div>
+                                <div class="pt-ms-what">
+                                    <strong>Compounding growth.</strong> Your network reaches ${years[4].sphere.toLocaleString()}+ contacts, past clients grow to ${years[4].pc.toLocaleString()}, and you're the go-to agent. ${firstDouble >= 0 ? `By Year ${firstDouble + 1}, you could <strong>double your current income</strong>.` : `By Year 5, you could reach <strong>${formatMoney(years[4].gci)}</strong>.`}
+                                </div>
+                            </div>
                         </div>
                     </div>`;
                 })()}
