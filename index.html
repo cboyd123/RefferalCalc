@@ -425,6 +425,70 @@
             margin-top: 2px;
         }
 
+        /* Network Health Score */
+        .health-score-card {
+            text-align: center;
+            padding: 28px 20px;
+            margin: 20px 0 8px;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            background: var(--card-bg);
+        }
+        .health-score-card .health-title {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+        }
+        .health-grade {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            font-size: 32px;
+            font-weight: 900;
+            line-height: 1;
+        }
+        .health-grade.grade-a { background: #dcfce7; color: #15803d; }
+        .health-grade.grade-b { background: #fef9c3; color: #a16207; }
+        .health-grade.grade-c { background: #ffedd5; color: #c2410c; }
+        .health-grade.grade-d { background: #fee2e2; color: #dc2626; }
+        .health-summary {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-top: 12px;
+            line-height: 1.5;
+        }
+        .health-factors {
+            display: flex;
+            gap: 8px;
+            margin-top: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .health-factor {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 12px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            background: #f5f5f5;
+            color: #555;
+        }
+        .health-factor .factor-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+        .factor-dot.good { background: #22c55e; }
+        .factor-dot.ok { background: #eab308; }
+        .factor-dot.poor { background: #ef4444; }
+
         /* Source footnote */
         .data-source {
             font-size: 11px;
@@ -779,6 +843,26 @@
             sphereRate:     sphereRates[state.data.sphereFrequency] || BENCHMARKS.sphereNeglectedRate,
             pastClientRate: pcRates[state.data.pastClientFrequency] || BENCHMARKS.pastClientNeglectedRate,
         };
+    }
+
+    function getNetworkHealthScore(sphereFreq, pcFreq, actualDeals, potentialDeals) {
+        // Score outreach frequency (0-3 each)
+        const freqScores = { monthly: 3, quarterly: 2, yearly: 1, rarely: 0 };
+        const sphereScore = freqScores[sphereFreq] ?? 0;
+        const pcScore = freqScores[pcFreq] ?? 0;
+
+        // Conversion efficiency: how close actual deals are to potential (0-4)
+        const efficiency = potentialDeals > 0 ? Math.min(actualDeals / potentialDeals, 1) : 0;
+        const efficiencyScore = Math.round(efficiency * 4);
+
+        // Total: 0-10
+        const total = sphereScore + pcScore + efficiencyScore;
+
+        if (total >= 9) return { grade: 'A+', cls: 'grade-a', msg: 'You\'re maximizing your network. Keep it up!' };
+        if (total >= 7) return { grade: 'A',  cls: 'grade-a', msg: 'Strong network habits — small tweaks can unlock the rest.' };
+        if (total >= 5) return { grade: 'B',  cls: 'grade-b', msg: 'Good foundation, but inconsistent outreach is costing you deals.' };
+        if (total >= 3) return { grade: 'C',  cls: 'grade-c', msg: 'Your network has potential, but it\'s under-nurtured.' };
+        return                  { grade: 'D',  cls: 'grade-d', msg: 'Your network is going cold — there\'s major upside waiting.' };
     }
 
     function getVisibleInputStepCount() {
@@ -1433,6 +1517,31 @@
                     </div>
                 </div>
                 ` : ''}
+
+                ${(() => {
+                    const health = getNetworkHealthScore(d.sphereFrequency, d.pastClientFrequency, actualDeals, potentialTotalDeals);
+                    const freqLabel = { monthly: 'good', quarterly: 'ok', yearly: 'poor', rarely: 'poor' };
+                    return `
+                    <div class="health-score-card">
+                        <div class="health-title">Network Health Score</div>
+                        <div class="health-grade ${health.cls}">${health.grade}</div>
+                        <div class="health-summary">${health.msg}</div>
+                        <div class="health-factors">
+                            <div class="health-factor">
+                                <span class="factor-dot ${freqLabel[d.sphereFrequency] || 'poor'}"></span>
+                                Sphere outreach
+                            </div>
+                            <div class="health-factor">
+                                <span class="factor-dot ${freqLabel[d.pastClientFrequency] || 'poor'}"></span>
+                                Past client outreach
+                            </div>
+                            <div class="health-factor">
+                                <span class="factor-dot ${potentialTotalDeals > 0 && (actualDeals / potentialTotalDeals) >= 0.6 ? 'good' : (actualDeals / potentialTotalDeals) >= 0.3 ? 'ok' : 'poor'}"></span>
+                                Conversion efficiency
+                            </div>
+                        </div>
+                    </div>`;
+                })()}
 
                 <div class="breakdown">
                     <div class="breakdown-title">How we calculated this</div>
