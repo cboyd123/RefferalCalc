@@ -534,6 +534,84 @@
             margin-top: 10px;
         }
 
+        /* Industry comparison */
+        .industry-compare {
+            margin: 20px 0 8px;
+            padding: 24px 20px;
+            border-radius: 14px;
+            border: 1px solid var(--border);
+            background: var(--card-bg);
+        }
+        .industry-compare .ic-title {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-muted);
+            margin-bottom: 18px;
+            text-align: center;
+        }
+        .ic-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+        .ic-row:last-child { margin-bottom: 0; }
+        .ic-row .ic-label {
+            width: 110px;
+            flex-shrink: 0;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-align: right;
+        }
+        .ic-bar-track {
+            flex: 1;
+            height: 22px;
+            background: #f0f0f0;
+            border-radius: 11px;
+            position: relative;
+            overflow: hidden;
+        }
+        .ic-bar-fill {
+            height: 100%;
+            border-radius: 11px;
+            transition: width 0.6s ease;
+        }
+        .ic-bar-fill.you { background: var(--primary); }
+        .ic-bar-fill.avg { background: #d1d5db; }
+        .ic-bar-fill.top { background: #a78bfa; }
+        .ic-row .ic-val {
+            width: 80px;
+            flex-shrink: 0;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        .ic-legend {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 16px;
+        }
+        .ic-legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            color: #666;
+        }
+        .ic-legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+        .ic-legend-dot.you { background: var(--primary); }
+        .ic-legend-dot.avg { background: #d1d5db; }
+        .ic-legend-dot.top { background: #a78bfa; }
+
         /* Source footnote */
         .data-source {
             font-size: 11px;
@@ -1620,6 +1698,83 @@
                         <div class="opp-headline">${top.label}</div>
                         <div class="opp-detail">${top.detail}</div>
                         <div class="opp-value">+${formatMoney(Math.round(top.value))}/yr</div>
+                    </div>`;
+                })()}
+
+                ${(() => {
+                    // NAR 2024 benchmarks
+                    const narAvgDeals = 10;
+                    const narTopDeals = 24;
+                    const narAvgGCI = 55000;
+                    const narTopGCI = 150000;
+                    const narAvgSphere = 150;
+                    const narTopSphere = 400;
+
+                    const maxDeals = Math.max(actualDeals, narTopDeals) * 1.1;
+                    const maxGCI = Math.max(currentIncome, narTopGCI) * 1.1;
+                    const maxSphere = Math.max(sphere + pastClients, narTopSphere) * 1.1;
+
+                    const pctBar = (val, max) => Math.min(Math.round((val / max) * 100), 100);
+
+                    return `
+                    <div class="industry-compare">
+                        <div class="ic-title">How you compare to the industry</div>
+                        <div class="ic-legend">
+                            <div class="ic-legend-item"><span class="ic-legend-dot you"></span> You</div>
+                            <div class="ic-legend-item"><span class="ic-legend-dot avg"></span> NAR Average</div>
+                            <div class="ic-legend-item"><span class="ic-legend-dot top"></span> Top 25%</div>
+                        </div>
+
+                        <div style="font-size:11px;font-weight:600;color:#999;margin-bottom:8px;text-transform:uppercase;letter-spacing:1px;">Transactions / year</div>
+                        <div class="ic-row">
+                            <span class="ic-label">You</span>
+                            <div class="ic-bar-track"><div class="ic-bar-fill you" style="width:${pctBar(actualDeals, maxDeals)}%"></div></div>
+                            <span class="ic-val">${actualDeals}</span>
+                        </div>
+                        <div class="ic-row">
+                            <span class="ic-label">Average agent</span>
+                            <div class="ic-bar-track"><div class="ic-bar-fill avg" style="width:${pctBar(narAvgDeals, maxDeals)}%"></div></div>
+                            <span class="ic-val">${narAvgDeals}</span>
+                        </div>
+                        <div class="ic-row">
+                            <span class="ic-label">Top 25%</span>
+                            <div class="ic-bar-track"><div class="ic-bar-fill top" style="width:${pctBar(narTopDeals, maxDeals)}%"></div></div>
+                            <span class="ic-val">${narTopDeals}</span>
+                        </div>
+
+                        <div style="font-size:11px;font-weight:600;color:#999;margin:18px 0 8px;text-transform:uppercase;letter-spacing:1px;">Gross Commission Income</div>
+                        <div class="ic-row">
+                            <span class="ic-label">You</span>
+                            <div class="ic-bar-track"><div class="ic-bar-fill you" style="width:${pctBar(currentIncome, maxGCI)}%"></div></div>
+                            <span class="ic-val">${formatMoney(currentIncome)}</span>
+                        </div>
+                        <div class="ic-row">
+                            <span class="ic-label">Average agent</span>
+                            <div class="ic-bar-track"><div class="ic-bar-fill avg" style="width:${pctBar(narAvgGCI, maxGCI)}%"></div></div>
+                            <span class="ic-val">${formatMoney(narAvgGCI)}</span>
+                        </div>
+                        <div class="ic-row">
+                            <span class="ic-label">Top 25%</span>
+                            <div class="ic-bar-track"><div class="ic-bar-fill top" style="width:${pctBar(narTopGCI, maxGCI)}%"></div></div>
+                            <span class="ic-val">${formatMoney(narTopGCI)}</span>
+                        </div>
+
+                        <div style="font-size:11px;font-weight:600;color:#999;margin:18px 0 8px;text-transform:uppercase;letter-spacing:1px;">Network Size</div>
+                        <div class="ic-row">
+                            <span class="ic-label">You</span>
+                            <div class="ic-bar-track"><div class="ic-bar-fill you" style="width:${pctBar(sphere + pastClients, maxSphere)}%"></div></div>
+                            <span class="ic-val">${(sphere + pastClients).toLocaleString()}</span>
+                        </div>
+                        <div class="ic-row">
+                            <span class="ic-label">Average agent</span>
+                            <div class="ic-bar-track"><div class="ic-bar-fill avg" style="width:${pctBar(narAvgSphere, maxSphere)}%"></div></div>
+                            <span class="ic-val">${narAvgSphere}</span>
+                        </div>
+                        <div class="ic-row">
+                            <span class="ic-label">Top 25%</span>
+                            <div class="ic-bar-track"><div class="ic-bar-fill top" style="width:${pctBar(narTopSphere, maxSphere)}%"></div></div>
+                            <span class="ic-val">${narTopSphere}</span>
+                        </div>
                     </div>`;
                 })()}
 
