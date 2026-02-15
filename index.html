@@ -714,6 +714,101 @@
         }
         .pt-ms-what strong { color: var(--text-primary); }
 
+        /* Donut chart — Sphere vs Past Clients */
+        .donut-section {
+            margin: 20px 0 8px;
+            padding: 24px 20px;
+            border-radius: 14px;
+            border: 1px solid var(--border);
+            background: var(--card-bg);
+        }
+        .donut-section .donut-title {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+            text-align: center;
+        }
+        .donut-section .donut-subtitle {
+            font-size: 13px;
+            color: #888;
+            text-align: center;
+            margin-bottom: 18px;
+        }
+        .donut-layout {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 28px;
+            flex-wrap: wrap;
+        }
+        .donut-svg-wrap {
+            position: relative;
+            width: 170px;
+            height: 170px;
+            flex-shrink: 0;
+        }
+        .donut-svg-wrap svg {
+            transform: rotate(-90deg);
+        }
+        .donut-center-label {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+        .donut-center-label .dcl-number {
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--text-primary);
+            line-height: 1;
+        }
+        .donut-center-label .dcl-text {
+            font-size: 10px;
+            font-weight: 600;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .donut-details {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+        .donut-detail-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .dd-color {
+            width: 14px;
+            height: 14px;
+            border-radius: 4px;
+            flex-shrink: 0;
+        }
+        .dd-color.sphere { background: var(--primary); }
+        .dd-color.past-clients { background: #a78bfa; }
+        .dd-info {
+            display: flex;
+            flex-direction: column;
+        }
+        .dd-info .dd-label {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        .dd-info .dd-stats {
+            font-size: 11.5px;
+            color: #888;
+            line-height: 1.4;
+        }
+        .dd-info .dd-stats strong {
+            color: var(--text-primary);
+        }
+
         /* Source footnote */
         .data-source {
             font-size: 11px;
@@ -1974,6 +2069,78 @@
                                 <div class="pt-ms-when">Year 3–5</div>
                                 <div class="pt-ms-what">
                                     <strong>Compounding growth.</strong> Your network reaches ${years[4].sphere.toLocaleString()}+ contacts, past clients grow to ${years[4].pc.toLocaleString()}, and you're the go-to agent. ${firstDouble >= 0 ? `By Year ${firstDouble + 1}, you could <strong>double your current income</strong>.` : `By Year 5, you could reach <strong>${formatMoney(years[4].gci)}</strong>.`}
+                                </div>
+                            </div>
+                        </div>
+                    </div>`;
+                })()}
+
+                ${(() => {
+                    // Donut chart: where your deals come from
+                    const total = sphere + pastClients;
+                    if (total === 0) return '';
+                    const spherePct = Math.round((sphere / total) * 100);
+                    const pcPct = 100 - spherePct;
+
+                    // SVG donut math
+                    const radius = 65;
+                    const circumference = 2 * Math.PI * radius;
+                    const sphereArc = (spherePct / 100) * circumference;
+                    const pcArc = (pcPct / 100) * circumference;
+
+                    // Deal contributions
+                    const sphereGCI = currentSphereDeals * gciPerDeal;
+                    const pcGCI = currentPCDeals * gciPerDeal;
+                    const potSphereGCI = potentialSphereDeals * gciPerDeal;
+                    const potPCGCI = potentialPCDeals * gciPerDeal;
+
+                    return `
+                    <div class="donut-section">
+                        <div class="donut-title">Where your deals come from</div>
+                        <div class="donut-subtitle">Network composition & deal contribution</div>
+
+                        <div class="donut-layout">
+                            <div class="donut-svg-wrap">
+                                <svg width="170" height="170" viewBox="0 0 170 170">
+                                    <circle cx="85" cy="85" r="${radius}" fill="none"
+                                        stroke="#1a1a1a" stroke-width="24"
+                                        stroke-dasharray="${sphereArc} ${circumference - sphereArc}"
+                                        stroke-dashoffset="0" />
+                                    <circle cx="85" cy="85" r="${radius}" fill="none"
+                                        stroke="#a78bfa" stroke-width="24"
+                                        stroke-dasharray="${pcArc} ${circumference - pcArc}"
+                                        stroke-dashoffset="${-sphereArc}" />
+                                </svg>
+                                <div class="donut-center-label">
+                                    <div class="dcl-number">${total.toLocaleString()}</div>
+                                    <div class="dcl-text">contacts</div>
+                                </div>
+                            </div>
+
+                            <div class="donut-details">
+                                <div class="donut-detail-row">
+                                    <div class="dd-color sphere"></div>
+                                    <div class="dd-info">
+                                        <div class="dd-label">Sphere of Influence — ${spherePct}%</div>
+                                        <div class="dd-stats">
+                                            ${sphere.toLocaleString()} people &middot; ${currentSphereDeals.toFixed(1)} deals/yr &middot; <strong>${formatMoney(sphereGCI)}</strong>
+                                        </div>
+                                        <div class="dd-stats">
+                                            Potential: ${potentialSphereDeals.toFixed(1)} deals &rarr; <strong>${formatMoney(potSphereGCI)}</strong>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="donut-detail-row">
+                                    <div class="dd-color past-clients"></div>
+                                    <div class="dd-info">
+                                        <div class="dd-label">Past Clients — ${pcPct}%</div>
+                                        <div class="dd-stats">
+                                            ${pastClients.toLocaleString()} people &middot; ${currentPCDeals.toFixed(1)} deals/yr &middot; <strong>${formatMoney(pcGCI)}</strong>
+                                        </div>
+                                        <div class="dd-stats">
+                                            Potential: ${potentialPCDeals.toFixed(1)} deals &rarr; <strong>${formatMoney(potPCGCI)}</strong>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
