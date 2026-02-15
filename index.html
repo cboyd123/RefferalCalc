@@ -1239,14 +1239,20 @@
         // ACTUAL income based on their real numbers
         const currentIncome = actualDeals * gciPerDeal;
 
-        // Potential based on their stated touch frequency
+        // Current frequency deals (what their network generates now)
         const rates = getConversionRates();
-        const potentialSphereDeals = sphere * rates.sphereRate;
-        const potentialPCDeals = pastClients * rates.pastClientRate;
+        const currentSphereDeals = sphere * rates.sphereRate;
+        const currentPCDeals = pastClients * rates.pastClientRate;
+        const currentNetworkDeals = currentSphereDeals + currentPCDeals;
+        const currentNetworkIncome = currentNetworkDeals * gciPerDeal;
+
+        // Potential at MONTHLY outreach (the full upside)
+        const potentialSphereDeals = sphere * BENCHMARKS.sphereNurturedRate;
+        const potentialPCDeals = pastClients * BENCHMARKS.pastClientNurturedRate;
         const potentialTotalDeals = potentialSphereDeals + potentialPCDeals;
         const potentialIncome = potentialTotalDeals * gciPerDeal;
 
-        // Gap = what they could be making minus what they actually made
+        // Gap = monthly potential minus what they actually made
         const gap = potentialIncome - currentIncome;
         const gapDeals = potentialTotalDeals - actualDeals;
 
@@ -1266,7 +1272,7 @@
                 <div class="result-card potential">
                     <div class="result-label">What your network could generate</div>
                     <div class="result-value">${formatMoney(potentialIncome)}<span style="font-size:16px;font-weight:400;color:#777">/yr</span></div>
-                    <div class="result-detail">~${potentialTotalDeals.toFixed(1)} transactions/year based on your current outreach frequency</div>
+                    <div class="result-detail">~${potentialTotalDeals.toFixed(1)} transactions/year with consistent monthly outreach</div>
                 </div>
 
                 ${gap > 0 ? `
@@ -1303,12 +1309,28 @@
                         <span class="label">Past clients</span>
                         <span class="value">${pastClients.toLocaleString()} people</span>
                     </div>
+                    <div class="breakdown-row" style="border-top:2px solid var(--border);margin-top:4px;padding-top:14px;">
+                        <span class="label" style="font-weight:700;">Where you are now (${getFrequencyLabel(d.sphereFrequency)} outreach)</span>
+                        <span class="value"></span>
+                    </div>
+                    <div class="breakdown-row">
+                        <span class="label">Sphere (${(rates.sphereRate * 100).toFixed(1)}% conversion)</span>
+                        <span class="value">${currentSphereDeals.toFixed(1)} deals &rarr; ${formatMoney(currentSphereDeals * gciPerDeal)}</span>
+                    </div>
+                    <div class="breakdown-row">
+                        <span class="label">Past clients (${(rates.pastClientRate * 100).toFixed(1)}% conversion)</span>
+                        <span class="value">${currentPCDeals.toFixed(1)} deals &rarr; ${formatMoney(currentPCDeals * gciPerDeal)}</span>
+                    </div>
+                    <div class="breakdown-row highlight" style="border-top:2px solid var(--border);margin-top:4px;padding-top:14px;">
+                        <span class="label" style="font-weight:700;">With monthly outreach</span>
+                        <span class="value"></span>
+                    </div>
                     <div class="breakdown-row highlight">
-                        <span class="label">Sphere potential (${getFrequencyLabel(d.sphereFrequency)} = ${(rates.sphereRate * 100).toFixed(1)}%)</span>
+                        <span class="label">Sphere (${(BENCHMARKS.sphereNurturedRate * 100).toFixed(1)}% conversion)</span>
                         <span class="value">${potentialSphereDeals.toFixed(1)} deals &rarr; ${formatMoney(potentialSphereDeals * gciPerDeal)}</span>
                     </div>
                     <div class="breakdown-row highlight">
-                        <span class="label">Past clients (${getFrequencyLabel(d.pastClientFrequency)} = ${(rates.pastClientRate * 100).toFixed(1)}%)</span>
+                        <span class="label">Past clients (${(BENCHMARKS.pastClientNurturedRate * 100).toFixed(1)}% conversion)</span>
                         <span class="value">${potentialPCDeals.toFixed(1)} deals &rarr; ${formatMoney(potentialPCDeals * gciPerDeal)}</span>
                     </div>
                     <div class="breakdown-row" style="border-top:2px solid var(--border);margin-top:4px;padding-top:14px;">
@@ -1348,9 +1370,8 @@
         const commission = Number(d.commissionPct) / 100;
         const gciPerDeal = homePrice * commission;
         const currentIncome = actualDeals * gciPerDeal;
-        const rates = getConversionRates();
-        const potentialSphereDeals = sphere * rates.sphereRate;
-        const potentialPCDeals = pastClients * rates.pastClientRate;
+        const potentialSphereDeals = sphere * BENCHMARKS.sphereNurturedRate;
+        const potentialPCDeals = pastClients * BENCHMARKS.pastClientNurturedRate;
         const potentialTotalDeals = potentialSphereDeals + potentialPCDeals;
         const potentialIncome = potentialTotalDeals * gciPerDeal;
         const gap = potentialIncome - currentIncome;
