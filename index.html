@@ -392,6 +392,39 @@
             color: #92400e;
         }
 
+        /* Monthly breakdown */
+        .monthly-breakdown {
+            display: flex;
+            gap: 12px;
+            margin: 20px 0 8px;
+        }
+        .monthly-card {
+            flex: 1;
+            text-align: center;
+            padding: 16px 12px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: var(--card-bg);
+        }
+        .monthly-card .monthly-label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+        .monthly-card .monthly-value {
+            font-size: 22px;
+            font-weight: 800;
+            color: #b45309;
+        }
+        .monthly-card .monthly-context {
+            font-size: 11px;
+            color: #999;
+            margin-top: 2px;
+        }
+
         /* Source footnote */
         .data-source {
             font-size: 11px;
@@ -1380,6 +1413,26 @@
                     </div>
                     ` : ''}
                 </div>
+
+                ${gap > 0 ? `
+                <div class="monthly-breakdown">
+                    <div class="monthly-card">
+                        <div class="monthly-label">Per month</div>
+                        <div class="monthly-value">+${formatMoney(Math.round(gap / 12))}</div>
+                        <div class="monthly-context">extra income</div>
+                    </div>
+                    <div class="monthly-card">
+                        <div class="monthly-label">Per week</div>
+                        <div class="monthly-value">+${formatMoney(Math.round(gap / 52))}</div>
+                        <div class="monthly-context">extra income</div>
+                    </div>
+                    <div class="monthly-card">
+                        <div class="monthly-label">Per deal</div>
+                        <div class="monthly-value">${formatMoney(gciPerDeal)}</div>
+                        <div class="monthly-context">${gapDeals.toFixed(1)} extra deals</div>
+                    </div>
+                </div>
+                ` : ''}
 
                 <div class="breakdown">
                     <div class="breakdown-title">How we calculated this</div>
