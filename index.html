@@ -321,6 +321,77 @@
         }
         .breakdown-row.highlight .value { color: var(--success); font-weight: 700; }
 
+        /* Visual bar chart */
+        .bar-chart {
+            margin: 28px 0 8px;
+            padding: 20px 24px 24px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: var(--card-bg);
+        }
+        .bar-chart-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 20px;
+        }
+        .bar-row {
+            margin-bottom: 16px;
+        }
+        .bar-row:last-child {
+            margin-bottom: 0;
+        }
+        .bar-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 6px;
+        }
+        .bar-label-text {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+        .bar-label-value {
+            font-size: 15px;
+            font-weight: 800;
+        }
+        .bar-track {
+            height: 32px;
+            background: var(--bg);
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+        }
+        .bar-fill {
+            height: 100%;
+            border-radius: 8px;
+            transition: width 1s ease-out;
+            min-width: 2%;
+        }
+        .bar-fill.current {
+            background: linear-gradient(90deg, #fca5a5, #ef4444);
+        }
+        .bar-fill.potential {
+            background: linear-gradient(90deg, #86efac, #16a34a);
+        }
+        .bar-fill.gap-fill {
+            background: linear-gradient(90deg, #fde68a, #f59e0b);
+        }
+        .bar-gap-marker {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 12px;
+            padding: 8px 16px;
+            background: #fef9e7;
+            border: 1px dashed #f5c518;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 700;
+            color: #92400e;
+        }
+
         /* Source footnote */
         .data-source {
             font-size: 11px;
@@ -1282,6 +1353,33 @@
                     <div class="result-detail">That's ~${gapDeals.toFixed(1)} extra deals per year sitting in your phone right now</div>
                 </div>
                 ` : ''}
+
+                <div class="bar-chart">
+                    <div class="bar-chart-title">Your income at a glance</div>
+                    <div class="bar-row">
+                        <div class="bar-label">
+                            <span class="bar-label-text">Current GCI</span>
+                            <span class="bar-label-value" style="color:var(--warning)">${formatMoney(currentIncome)}</span>
+                        </div>
+                        <div class="bar-track">
+                            <div class="bar-fill current" style="width:${potentialIncome > 0 ? Math.round((currentIncome / potentialIncome) * 100) : 0}%"></div>
+                        </div>
+                    </div>
+                    <div class="bar-row">
+                        <div class="bar-label">
+                            <span class="bar-label-text">Potential GCI (monthly outreach)</span>
+                            <span class="bar-label-value" style="color:var(--success)">${formatMoney(potentialIncome)}</span>
+                        </div>
+                        <div class="bar-track">
+                            <div class="bar-fill potential" style="width:100%"></div>
+                        </div>
+                    </div>
+                    ${gap > 0 ? `
+                    <div class="bar-gap-marker">
+                        +${formatMoney(gap)} opportunity gap
+                    </div>
+                    ` : ''}
+                </div>
 
                 <div class="breakdown">
                     <div class="breakdown-title">How we calculated this</div>
